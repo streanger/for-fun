@@ -43,13 +43,25 @@ def nqueen_random(quiet=True):
         if not quiet:
             print("Number of Q: {}, current position: {}\n{}\n".format(counter, pos, board))
             input()
-    return positions
+    return positions, board
+
+def chess_positions(positions=[]):
+    positions = list(zip(*positions))
+    digits = dict(zip([str(x) for x in range(8)], [str(x) for x in range(1,9)]))
+    alpha = dict(zip([str(x) for x in range(8)], list("abcdefgh")))
+    new = list(zip([alpha[str(y)] for y in positions[1]], [digits[str(x)] for x in positions[0]]))
+    new = ["".join(x) for x in new]
+    return new
     
     
 if __name__ == "__main__":
     for x in range(10):
-        positions = nqueen_random(quiet=False)
+        positions, board = nqueen_random(quiet=True)
         if len(positions) == 8:
-            print("Full number of queens. Positions:", positions)
+            #print("Full number of queens. Positions:", positions)
+            #print(board)
             break
+    chess_pos = chess_positions(positions)            
+    print(chess_pos)        
+            
             
