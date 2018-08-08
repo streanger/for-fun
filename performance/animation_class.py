@@ -42,8 +42,8 @@ class human:
 					  self.leftleg,
 					  self.humanname]
 					  
-	def move(self, spacex, direction="down" ):
-		spacex.movePart(self.parts, direction)	
+	def move(self, spacex, direction, steps):
+		spacex.movePart(self.parts, direction, steps)	
 	
 	def setCenter(self, spacex, pcen=[100,100], center=False):
 		spacex.setpcen(pcen, center)
@@ -69,8 +69,8 @@ class myhand:
 	
 	def __init__(self):
 		#make canvas
-		self.screenWidth = 600
-		self.screenHeight = 450
+		self.screenWidth = 1366
+		self.screenHeight = 768
 		self.space = Tk()
 		self.canvas = Canvas(self.space, width=self.screenWidth, height=self.screenHeight)
 		self.canvas.config(bg="black")
@@ -89,7 +89,7 @@ class myhand:
 	def setFont(self, family="times", fontsize=15, fontstyle='bold'):
 		self.font = (family,fontsize,fontstyle)
 	
-	def movePart(self, parts, direct="down"):
+	def movePart(self, parts, direct="down", steps=10):
 		if (direct=="forward"):
 			x,y = 1,2
 		elif (direct=="back"):
@@ -104,8 +104,8 @@ class myhand:
 			x,y = 0,1
 		else:
 			x,y = 1,1
-		for i in range(30):
-			time.sleep(0.001)
+		for i in range(steps):
+			time.sleep(0.0001)
 			for part in parts:
 				#this is for iterating throughout all elements in parts
 				try:
