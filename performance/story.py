@@ -1,7 +1,7 @@
 #story with anime
 import animation_class as anime
 
-def some():
+def some_story():
     spacex = anime.myhand()
         
     steve = anime.human("steve", "male")
@@ -15,39 +15,41 @@ def some():
 
     steve.makePart(spacex)
     annie.makePart(spacex)
-    annie.move(spacex, 'right')
-    annie.move(spacex, 'right')
-    annie.move(spacex, 'forward')
-    annie.move(spacex)
-    steve.move(spacex)
-    steve.move(spacex)
+    annie.move(spacex, 'right', 30)
+    annie.move(spacex, 'right', 90)
+    annie.move(spacex, 'forward', 30)
+    annie.move(spacex, 'x', 30)
+    steve.move(spacex, 'x', 30)
+    steve.move(spacex, 'x', 30)
 
     stranger.setCenter(spacex, center=True)
     stranger.makePart(spacex)
-    stranger.move(spacex, "left")
-    steve.move(spacex, "right")
-    steve.move(spacex)
-    stranger.move(spacex, "right")
-    stranger.move(spacex, "right")
-    stranger.move(spacex, "right")
+    stranger.move(spacex, "left", 30)
+    steve.move(spacex, "right", 30)
+    steve.move(spacex, 'x', 30)
+    stranger.move(spacex, "right", 30)
+    stranger.move(spacex, "right", 30)
+    stranger.move(spacex, "right", 30)
 
     kate.setCenter(spacex, [450,285])
     kate.makePart(spacex)
-    kate.move(spacex, 'up')
-    kate.move(spacex, 'up')
-    kate.move(spacex, 'left')
+    kate.move(spacex, 'up', 30)
+    kate.move(spacex, 'up', 30)
+    kate.move(spacex, 'left', 30)
+    kate.move(spacex, 'forward', 80)
+    kate.move(spacex, 'right', 120)
 
     for x in range(4):
-        stranger.move(spacex, "up")
-        stranger.move(spacex, "down")
-        kate.move(spacex, 'up')
-        kate.move(spacex, 'down')
+        stranger.move(spacex, "up", 30)
+        stranger.move(spacex, "down", 30)
+        kate.move(spacex, 'up', 30)
+        kate.move(spacex, 'down', 30)
 
     #spacex.canvas.delete("all")	
         
     #close curtain
     kate.makeDecoration(spacex, full=False)
-    kate.openCurtain(spacex, openSpeed="normal", direct="close")
+    kate.openCurtain(spacex, openSpeed="fast", direct="close")
 
 
     #wtf
@@ -56,7 +58,7 @@ def some():
     movement = '4444333333324242424111111111111'
     for moves in movement:
         for move in moves:
-            stranger.move(spacex, str(move))
+            stranger.move(spacex, str(move), 30)
 
     print("works fine")
     
@@ -77,8 +79,8 @@ def create_humans(space, number, center):
             human.move(space, 'left', 15 + 30*x)
         humans.append(human)
     return humans    
-        
-if __name__ == "__main__":
+
+def main():
     row_number = 10
     spacex = anime.myhand()
     humans_01 = create_humans(space=spacex, number=row_number, center=(660,200))
@@ -90,4 +92,8 @@ if __name__ == "__main__":
     out = [human.move(spacex, 'left', 225) for human in humans_03]
     out = [human.move(spacex, 'right', 225) for human in humans_04]
     
-        
+    
+if __name__ == "__main__":
+    #main()
+    some_story()
+    
