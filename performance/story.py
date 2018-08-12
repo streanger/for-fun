@@ -2,6 +2,15 @@
 import random
 import animation_class as anime
 import sys
+from PIL import ImageGrab
+import os
+import sys
+
+def script_path():
+    '''change current path to script one'''
+    path = os.path.realpath(os.path.dirname(sys.argv[0]))
+    os.chdir(path)  #it seems to be quite important
+    return path
 
 def some_story():
     spacex = anime.myhand()
@@ -102,6 +111,7 @@ def create_random(space, true_center, names=[]):
     return humans   
     
 def main():
+    path = script_path()
     nicks = '''some, one, else'''
     to_call = " ".join(["@" + item.strip() for item in nicks.split(",")])
     humans_names = [item.strip() for item in nicks.split(',')]
@@ -109,15 +119,30 @@ def main():
     
     #humans_names = ["steve" + str(x) for x in range(2500)]
     spacex = anime.myhand()
-    humans_all = create_random(space=spacex, true_center=(600, 200), names=humans_names[:])
+    humans_all = create_random(space=spacex, true_center=(200, 500), names=humans_names[:])
     #humans_all = create_random(space=spacex, true_center=(600, 200), names=humans_names[:5])
     #humans_all = create_random(space=spacex, true_center=(660, 300), names=humans_names[5:10])
     #humans_all = create_random(space=spacex, true_center=(720, 400), names=humans_names[10:15])
     #humans_all = create_random(space=spacex, true_center=(780, 500), names=humans_names[15:20])
     the_one = humans_all[0]
-    the_one.say_something(spacex, "some title")
+    #the_one.say_something(spacex, "some title")
     the_one.move(spacex, 'up', 1)
     
+    while True:
+        for the_one in humans_all:
+            the_one.jump(spacex, 100, 40, 5)
+            the_one.jump(spacex, 100, 80, 5)
+            the_one.jump(spacex, 100, 160, 5)
+            the_one.jump(spacex, 100, 250, 5)
+            the_one.jump(spacex, 100, 250, -5)
+            the_one.jump(spacex, 100, 160, -5)
+            the_one.jump(spacex, 100, 80, -5)
+            the_one.jump(spacex, 100, 40, -5)
+            
+    #file = ("shot_{}_{}.png".format(time.strftime("%Y%m%d"), time.strftime("%H%M%S")))        
+    #ImageGrab.grab((30,100,1000,700)).save(file + '.jpg')    
+
+       
     
     '''
     spacex = anime.myhand()

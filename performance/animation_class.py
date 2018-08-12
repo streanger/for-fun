@@ -8,6 +8,7 @@
 from tkinter import *
 import time
 import random
+from PIL import ImageGrab
 
 class human:
 
@@ -44,6 +45,9 @@ class human:
                       
     def move(self, spacex, direction, steps):
         spacex.movePart(self.parts, direction, steps)    
+    
+    def jump(self, spacex, a_factor, b_factor, step):
+        spacex.jump(self.parts, a_factor, b_factor, step)
     
     def say_something(self, spacex, some_text):
         spacex.putTitle(some_text)
@@ -129,7 +133,30 @@ class myhand:
                     self.canvas.move(part, x, y)    #just part not every single thing
                     self.canvas.pack()
                     self.canvas.update()
-            
+    
+    def jump(self, parts, a_factor, b_factor, step):
+        jump_path = [round(-a_factor*((x*0.1)**2)+b_factor) for x in range(-b_factor, b_factor)]
+        jump_path = [item for item in jump_path if item > 0]
+        jump_path = [item - jump_path[key-1] for key, item in enumerate(jump_path) if key > 0]
+        for key, value in enumerate(jump_path):
+            time.sleep(0.02)
+            for part in parts:
+                #this is for iterating throughout all elements in parts
+                try:
+                    for element in part:
+                        #print(element)
+                        self.canvas.move(element, step, -value)    #just part not every single thing
+                        self.canvas.pack()
+                        self.canvas.update()
+                except:
+                    #print(part)
+                    self.canvas.move(part, step, -value)    #just part not every single thing
+                    self.canvas.pack()
+                    self.canvas.update()
+            #file = ("shot_{}_{}.png".format(time.strftime("%Y%m%d"), time.strftime("%H%M%S")))        
+            #ImageGrab.grab((30,100,1000,700)).save(file + '.jpg')
+            #input("key {} value {}".format(key, value))
+    
     def setCenter(self, xpoint, ypoint):
         self.centerx = xpoint
         self.centery = ypoint
