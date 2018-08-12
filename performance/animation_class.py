@@ -45,6 +45,9 @@ class human:
     def move(self, spacex, direction, steps):
         spacex.movePart(self.parts, direction, steps)    
     
+    def say_something(self, spacex, some_text):
+        spacex.putTitle(some_text)
+    
     def setCenter(self, spacex, pcen=[100,100], center=False):
         spacex.setpcen(pcen, center)
     
@@ -86,10 +89,13 @@ class myhand:
         #person center; variable
         self.pcen = [120,120]
         #font atributes
-        self.font = ('times', 12, 'bold')
+        self.font = ('times', 14, 'bold')
         
     def setFont(self, family="times", fontsize=15, fontstyle='bold'):
         self.font = (family,fontsize,fontstyle)
+    
+    def putTitle(self, title="some_title"):
+        self.canvas.create_text(680,30,fill="blue",font="Times 40 italic bold", text=title)
     
     def movePart(self, parts, direct="down", steps=10):
         if (direct=="forward"):
@@ -157,7 +163,7 @@ class myhand:
     def printName(self, name="name", vx=1,vy=1):
         self.vx = vx
         self.vy = vy
-        return self.canvas.create_text(self.pcen[0],self.pcen[1]-20, text=name, font=self.font, fill="white")
+        return self.canvas.create_text(self.pcen[0],self.pcen[1]-20, text=name, font=self.font, fill=random.choice(["white", "purple", "green", "yellow", "blue"]))
         
     def createLeg(self, vx=1,vy=1):
         self.vx = vx
