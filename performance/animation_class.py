@@ -154,10 +154,9 @@ class myhand:
                     self.canvas.move(part, step, -value)    #just part not every single thing
                     self.canvas.pack()
                     self.canvas.update()
-            #file = ("shot_{}_{}.png".format(time.strftime("%Y%m%d"), time.strftime("%H%M%S")))
-            file = "shot_" + str(round(time.time(),3)) + ".jpg"
-            file_path = os.path.join("animation", file)
-            ImageGrab.grab((30,100,1000,700)).save(file_path)
+            #file = "shot_" + str(round(time.time(),3)) + ".jpg"
+            #file_path = os.path.join("animation", file)
+            #ImageGrab.grab((30,100,1000,700)).save(file_path)
             #input("key {} value {}".format(key, value))
     
     def setCenter(self, xpoint, ypoint):
