@@ -128,7 +128,8 @@ def main():
     #the_one.say_something(spacex, "some title")
     the_one.move(spacex, 'up', 1)
     
-    while True:
+    #while True:
+    for x in range(1):
         for the_one in humans_all:
             the_one.jump(spacex, 100, 40, 5)
             the_one.jump(spacex, 100, 80, 5)
@@ -139,8 +140,8 @@ def main():
             the_one.jump(spacex, 100, 80, -5)
             the_one.jump(spacex, 100, 40, -5)
             
-    #file = ("shot_{}_{}.png".format(time.strftime("%Y%m%d"), time.strftime("%H%M%S")))        
-    #ImageGrab.grab((30,100,1000,700)).save(file + '.jpg')    
+    #file = "shot_" + str(round(time.time(),2)) + ".jpg"        
+    #ImageGrab.grab((30,100,1000,700)).save(file)    
 
        
     
