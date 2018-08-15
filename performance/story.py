@@ -7,6 +7,7 @@ import os
 import sys
 from alpha_image import alpha_image
 from wykop_avatars import convert_nick_str_to_list, save_avatars
+import check_gender_by_nick
 
 def script_path():
     '''change current path to script one'''
@@ -99,8 +100,24 @@ def create_humans(space, number, center, name="steve"):
             #human.move(space, 'down', 2)
             human.move(space, 'left', 15 + 30*x)
         humans.append(human)
-    return humans
+    return humans   
+    
+def check_sex(nick):
+    base_url = "https://www.wykop.pl/ludzie/"
+    nick_url = urllib.parse.urljoin(base_url, nick)
+    res = requests.get(nick_url)
+    content = res.text
+    status = res.status_code    
+    #content, status = get_content(nick_url)
+    if status == 404:
+        return ""
+    soup = bs.BeautifulSoup(content, 'lxml')
+    hrefs = soup.find_all('meta', {'name': "profile:gender"})
+    print(hrefs)
+    #return avatar_url
 
+    return 'male'
+    
 def create_random(space, true_center, names):
     humans = []
     for key, (nick, face_img) in enumerate(names.items()):
@@ -108,7 +125,9 @@ def create_random(space, true_center, names):
         #center = true_center #(660, 400)
         
         #face_img = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png", ""])
-        human = anime.human(nick, "male", face_img)
+        sex, _ = check_gender_by_nick.check_sex(nick)       #it returns tuple
+        print(sex)
+        human = anime.human(nick, sex, face_img)
         human.setCenter(space, center)
         human.makePart(space)
         human.move(space, 'down', 1)
@@ -177,10 +196,11 @@ def vikop_story():
                @Kulturalny_Jegomosc90 @milicja @Slacky @Faiko @Piter93
                @archol039 @7845 @namzio @Rodzynek_w_serniku @Smutny_Daltonista
                @Efilnikufesin @Derisor @aceXgod'''
+    #nicks = '''@anheli @jozemjo'''
     nick_list, to_call = convert_nick_str_to_list(nicks)
     avatars_paths = save_avatars(nick_list, subdir='avatars')       #in normal size
     avatars_paths = {key: alpha_image(value, 80, 80, 'circle_avatars') for key, value in avatars_paths.items()}     #resize, circle, alpha channel
-    humans_names = avatars_paths.keys()
+    humans_names = list(avatars_paths.keys())
     print(humans_names)
     
     spacex = anime.myhand(bg_color="black", line_size=2)
@@ -208,4 +228,5 @@ todo:
     -cut circle +
     -make alpha channel +
     -add 'say' method with clouds
+    -prevent overwriting avatars image in directory
 '''
