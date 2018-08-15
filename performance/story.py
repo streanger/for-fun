@@ -96,7 +96,7 @@ def create_random(space, true_center, names=[]):
     for key, name in enumerate(names):
         center=(random.randrange(150, 1266), random.randrange(200, 668))
         center = true_center #(660, 400)
-        face_img = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png", "", ""])
+        face_img = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png", ""])
         human = anime.human(name, "male", face_img)
         human.setCenter(space, center)
         human.makePart(space)
