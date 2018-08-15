@@ -92,7 +92,7 @@ class human:
     
 class myhand:
     
-    def __init__(self):
+    def __init__(self, bg_color, line_size):
         #make canvas
         self.screenWidth = 1366
         self.screenHeight = 768
@@ -101,7 +101,7 @@ class myhand:
         self.space = Tk()
         #self.space = Toplevel()
         self.canvas = Canvas(self.space, width=self.screenWidth, height=self.screenHeight)
-        self.canvas.config(bg="blue")
+        self.canvas.config(bg=bg_color)
         self.canvas.pack()
         #mirroring reverse
         self.vx, self.vy = 1, 1
@@ -113,6 +113,7 @@ class myhand:
         #font atributes
         self.font = ('times', 14, 'bold')
         self.path = script_path()
+        self.line_size = line_size
         
     def setFont(self, family="times", fontsize=15, fontstyle='bold'):
         self.font = (family,fontsize,fontstyle)
@@ -219,7 +220,7 @@ class myhand:
                                             self.pcen[0]-20*self.vx, self.pcen[1], 
                                             self.pcen[0]-10*self.vx, self.pcen[1]+70*self.vy, 
                                             self.pcen[0], self.pcen[1]+70*self.vy,  
-                                            outline="white", fill="black", width=3)
+                                            outline="white", fill="black", width=self.line_size)
         return manleg
         
     def createLegF(self, vx=1,vy=1):
@@ -229,7 +230,7 @@ class myhand:
                                               self.pcen[0]-13*self.vx,self.pcen[1]+40,
                                               self.pcen[0]-8*self.vx,self.pcen[1]+70*self.vy,
                                               self.pcen[0],self.pcen[1]+70*self.vy,
-                                              outline="white",fill="#ffe6b3", width=2)
+                                              outline="white",fill="#ffe6b3", width=self.line_size)
         return womanleg
     
     def createHead(self, img, vx=1, vy=1):
@@ -259,7 +260,10 @@ class myhand:
     def createShoes(self, vx=1, vy=1):
         self.vx = vx
         self.vy = vy
-        return self.canvas.create_polygon(self.pcen[0],self.pcen[1]+70,self.pcen[0]-10*self.vx,self.pcen[1]+70,self.pcen[0]-20*self.vx,self.pcen[1]+75,self.pcen[0]-20*self.vx,self.pcen[1]+80,self.pcen[0],self.pcen[1]+80,self.pcen[0],self.pcen[1]+80, outline="white", fill="black", width=3)
+        return self.canvas.create_polygon(self.pcen[0],self.pcen[1]+70,self.pcen[0]-10*self.vx,self.pcen[1]+70,
+                                          self.pcen[0]-20*self.vx,self.pcen[1]+75,self.pcen[0]-20*self.vx,self.pcen[1]+80,
+                                          self.pcen[0],self.pcen[1]+80,self.pcen[0],self.pcen[1]+80,
+                                          outline="white", fill="black", width=self.line_size)
 
     def createBody(self, vx=1, vy=1):    
         self.vx = vx
@@ -272,7 +276,7 @@ class myhand:
                                           self.pcen[0]+25,self.pcen[1]-40,
                                           self.pcen[0]+25,self.pcen[1]-30,
                                           self.pcen[0]+20,self.pcen[1]-0,
-                                          outline="white", fill="black", width=3)
+                                          outline="white", fill="black", width=self.line_size)
         return body
             
     def createBodyF(self, vx=1, vy=1):    
@@ -286,12 +290,12 @@ class myhand:
                                           self.pcen[0]+23,self.pcen[1]-25,
                                           self.pcen[0]+20,self.pcen[1]-40,
                                           self.pcen[0]+10,self.pcen[1]-45,
-                                          outline="white", fill="black", width=3)
+                                          outline="white", fill="black", width=self.line_size)
         skirt = self.canvas.create_polygon(self.pcen[0]-15,self.pcen[1]+10,
                                            self.pcen[0]-30,self.pcen[1]+45,
                                            self.pcen[0]+30,self.pcen[1]+45,
                                            self.pcen[0]+15,self.pcen[1]+10,
-                                           outline="white", fill="black", width=3)
+                                           outline="white", fill="black", width=self.line_size)
         coord = (self.pcen[0]-13, self.pcen[1]-62, self.pcen[0]+13, self.pcen[1]-27 )
         cleavage = self.canvas.create_arc(coord, start=180, extent=180, fill="#ffe6b3", outline="white", width=2, style="chord")
         blackline = self.canvas.create_line(self.pcen[0]-10,self.pcen[1]-46,
@@ -307,16 +311,16 @@ class myhand:
                                             self.screenWidth,0,
                                             self.screenWidth,self.screenHeight,
                                             0,self.screenHeight,
-                                            fill="#b3ffff", width=1) 
+                                            fill="#b3ffff", width=self.line_size) 
         
         ground = self.canvas.create_polygon(0,self.screenHeight*0.9,
                                             self.screenWidth,self.screenHeight*0.9,
                                             self.screenWidth,self.screenHeight,
                                             0,self.screenHeight,
-                                            fill="green", width=1)
+                                            fill="green", width=self.line_size)
         groundline = self.canvas.create_line(0,self.screenHeight*0.9,
                                             self.screenWidth,self.screenHeight*0.9,
-                                            fill="brown", width=3)
+                                            fill="brown", width=self.line_size)
                                             
         return groundline, ground, bluesky
         
@@ -330,7 +334,7 @@ class myhand:
                                              fill="purple", width=1)
         curtainLine = self.canvas.create_line((self.screenWidth/2),0,
                                               (self.screenWidth/2),self.screenHeight*0.89,
-                                              fill="black", width=5)                                    
+                                              fill="black", width=self.line_size)                                    
         return curtain, curtainLine
         
     def createCurtainOpened(self, vx=0, vy=1):
@@ -343,7 +347,7 @@ class myhand:
                                               fill="purple", width=1)
         curtainLine = self.canvas.create_line((self.screenWidth/2)*(1+1*self.vx),0,
                                               (self.screenWidth/2)*(1+1*self.vx),self.screenHeight*0.89,
-                                              fill="black", width=5)                                    
+                                              fill="black", width=self.line_size)                                    
         return curtain, curtainLine
     
     def openCurtain(self, parts, openSpeed="normal", direct="open"):

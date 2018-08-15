@@ -5,6 +5,8 @@ import sys
 from PIL import ImageGrab, Image
 import os
 import sys
+from alpha_image import alpha_image
+from wykop_avatars import convert_nick_str_to_list, save_avatars
 
 def script_path():
     '''change current path to script one'''
@@ -12,13 +14,21 @@ def script_path():
     os.chdir(path)
     return path
 
+def make_dir(new_dir):
+    path = os.path.realpath(os.path.dirname(sys.argv[0]))
+    os.chdir(path)
+    if not os.path.exists(new_dir):
+        os.makedirs(new_dir)
+    new_path = os.path.join(path, new_dir)
+    return new_path    
+    
 def some_story():
-    spacex = anime.myhand()
+    spacex = anime.myhand(bg_color="blue", line_size=3)
         
-    steve = anime.human("steve", "male")
-    annie = anime.human("annie", "female")
-    stranger = anime.human("( ͡° ͜ʖ ͡°)", 'male')
-    kate = anime.human("kate", "female")
+    steve = anime.human("steve", "male", '')
+    annie = anime.human("annie", "female", '')
+    stranger = anime.human("( ͡° ͜ʖ ͡°)", 'male', '')
+    kate = anime.human("kate", "female", '')
 
     #open curtain
     kate.makeDecoration(spacex)
@@ -91,25 +101,26 @@ def create_humans(space, number, center, name="steve"):
         humans.append(human)
     return humans
 
-def create_random(space, true_center, names=[]):
+def create_random(space, true_center, names):
     humans = []
-    for key, name in enumerate(names):
-        center=(random.randrange(150, 1266), random.randrange(200, 668))
+    for key, (nick, face_img) in enumerate(names.items()):
+        center=(random.randrange(150, 1266), random.randrange(200, 608))
         #center = true_center #(660, 400)
-        face_img = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png", ""])
-        human = anime.human(name, "male", face_img)
+        
+        #face_img = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png", ""])
+        human = anime.human(nick, "male", face_img)
         human.setCenter(space, center)
         human.makePart(space)
         human.move(space, 'down', 1)
         if key%2 == 0:
             #human.move(space, 'up', 2)
-            human.move(space, 'right', 20 + 80*key)
+            human.move(space, 'right', 20 + 0*key)
             human.move(space, 'down', 20)
         else:
             #human.move(space, 'down', 2)
-            human.move(space, 'left', 20 + 80*key)       
+            human.move(space, 'left', 20 + 0*key)       
         humans.append(human)
-    return humans   
+    return humans
     
 def main():
     path = script_path()
@@ -159,14 +170,42 @@ def main():
     out = [human.move(spacex, 'left', 225) for human in humans_03]
     out = [human.move(spacex, 'right', 225) for human in humans_04]
     '''
+
+def vikop_story():
+    path = script_path()
+    nicks = '''@anheli @jozemjo @Arveit @Raptorini @Marterr_ @s0msiad
+               @Kulturalny_Jegomosc90 @milicja @Slacky @Faiko @Piter93
+               @archol039 @7845 @namzio @Rodzynek_w_serniku @Smutny_Daltonista
+               @Efilnikufesin @Derisor @aceXgod'''
+    nick_list, to_call = convert_nick_str_to_list(nicks)
+    avatars_paths = save_avatars(nick_list, subdir='avatars')       #in normal size
+    avatars_paths = {key: alpha_image(value, 80, 80, 'circle_avatars') for key, value in avatars_paths.items()}     #resize, circle, alpha channel
+    humans_names = avatars_paths.keys()
+    print(humans_names)
     
+    spacex = anime.myhand(bg_color="black", line_size=2)
+    creator = anime.human('creator', 'male', '')        #creator itself
+    #creator.makeDecoration(spacex)
+    creator.say_something(spacex, "armia przegrywów V2.0")
+    
+    humans_all = create_random(space=spacex, true_center=(200, 500), names=avatars_paths)
+    
+    
+    #download avatars
+    #convert avatars size and alpha; save it to specified dir
+    #create humans
+    #write scenario
+    
+
 if __name__ == "__main__":
-    main()
+    vikop_story()
+    #main()
     #some_story()
 
 '''    
 todo:
-    -rezie image
-    -cut circle
-    -make alpha channel
+    -rezie image +
+    -cut circle +
+    -make alpha channel +
+    -add 'say' method with clouds
 '''

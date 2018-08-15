@@ -15,13 +15,13 @@ def get_files(fileTypes=("png", "jpeg", "jpg")):
     return files
 
 def make_dir(new_dir):
-    'make new dir, switch to it and retur new path'
+    'make new dir, switch to it and return new path'
     path = os.path.realpath(os.path.dirname(sys.argv[0]))
     os.chdir(path)  #it seems to be quite important
     if not os.path.exists(new_dir):
         os.makedirs(new_dir)
     new_path = os.path.join(path, new_dir)
-    return new_path    
+    return new_path
 
 def show_img(img, title):
     cv2.imshow(title, img)
@@ -29,8 +29,7 @@ def show_img(img, title):
     cv2.destroyAllWindows()
     return True
     
-def resize_cut_and_alpha_image(file_name, new_height, new_width):
-    subDir = "RESIZED"
+def alpha_image(file_name, new_height, new_width, subdir):
     image = cv2.imread(file_name)
     resized = cv2.resize(image, (new_width, new_height))
     #cut circle here
@@ -42,10 +41,10 @@ def resize_cut_and_alpha_image(file_name, new_height, new_width):
     maskedImg = cv2.bitwise_and(img_BGRA, img_BGRA, mask=alpha_channel)
     #show_img(alpha_channel, "alpha image")
     #show_img(maskedImg, "masked")
-    path = make_dir(subDir)
-    path = os.path.join(path, file_name)
+    path = make_dir(subdir)
+    path = os.path.join(path, os.path.basename(file_name))
     cv2.imwrite(path, maskedImg)
-    return True
+    return path
 
 def read_alpha_channel_image(file_name):
     #
@@ -59,8 +58,8 @@ if __name__ == "__main__":
     path = script_path()
     #file = args[0]
     #file = "berk.png"
-    #status = resize_cut_and_alpha_image(file, 80, 80)
+    #status = alpha_image(file, 80, 80)
     files = get_files()
     for file in files:
-        status = resize_cut_and_alpha_image(file, 80, 80)
+        status = alpha_image(file, 80, 80, 'alpha')
     print("finished...")
