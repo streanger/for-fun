@@ -115,10 +115,11 @@ def main():
     nicks = '''some, one, else'''
     to_call = " ".join(["@" + item.strip() for item in nicks.split(",")])
     humans_names = [item.strip() for item in nicks.split(',')]
-    print(humans_names)
     
     #humans_names = ["steve" + str(x) for x in range(2500)]
     spacex = anime.myhand()
+    creator = anime.human('creator', 'male')        #creator itself
+    #creator.makeDecoration(spacex)
     humans_all = create_random(space=spacex, true_center=(200, 500), names=humans_names[:])
     #humans_all = create_random(space=spacex, true_center=(600, 200), names=humans_names[:5])
     #humans_all = create_random(space=spacex, true_center=(660, 300), names=humans_names[5:10])
@@ -128,8 +129,8 @@ def main():
     #the_one.say_something(spacex, "some title")
     the_one.move(spacex, 'up', 1)
     
-    #while True:
-    for x in range(1):
+    while True:
+    #for x in range(1):
         for the_one in humans_all:
             the_one.jump(spacex, 100, 40, 5)
             the_one.jump(spacex, 100, 80, 5)

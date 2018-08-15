@@ -8,14 +8,26 @@
 from tkinter import *
 import time
 import random
-from PIL import ImageGrab
+from PIL import ImageGrab, Image
 import os
+import sys
+
+def script_path():
+    '''change current path to script one'''
+    path = os.path.realpath(os.path.dirname(sys.argv[0]))
+    os.chdir(path)  #it seems to be quite important
+    return path
 
 class human:
 
     def __init__(self, name, sex):
         self.name = name
         self.sex = sex
+
+        self.file = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png"])
+        # self.file = "2.png"
+        #self.image = PhotoImage(file=self.file, master = self.space, width = 150, height = 150)
+        self.image = PhotoImage(file=self.file, width = 150, height = 150)
         
     def makePart(self, spacex):
         if (self.sex == "male"):
@@ -24,7 +36,7 @@ class human:
             self.rightleg = spacex.createLeg(vx=-1)
             self.leftleg = spacex.createLeg(vx=1)
             self.body = spacex.createBody()
-            self.head = spacex.createHead()
+            self.head = spacex.createHead(img=self.image)
             self.humanname = spacex.printName(self.name)    
         elif (self.sex == "female"):
             self.rightshoe = spacex.createShoes(vx=-1)
@@ -82,10 +94,14 @@ class myhand:
         #self.screenWidth = 600
         #self.screenHeight = 400
         self.space = Tk()
+        #self.space = Toplevel()
         self.canvas = Canvas(self.space, width=self.screenWidth, height=self.screenHeight)
-        self.canvas.config(bg="black")
+        self.canvas.config(bg="green")
         self.canvas.pack()
         
+        # self.file = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png"])
+        # self.file = "2.png"
+        # self.image = PhotoImage(file=self.file, master = self.space, width = 150, height = 150)
         #mirroring reverse
         self.vx, self.vy = 1, 1
         self.x, self.y = 1, 1
@@ -95,6 +111,7 @@ class myhand:
         self.pcen = [120,120]
         #font atributes
         self.font = ('times', 14, 'bold')
+        self.path = script_path()
         
     def setFont(self, family="times", fontsize=15, fontstyle='bold'):
         self.font = (family,fontsize,fontstyle)
@@ -214,10 +231,20 @@ class myhand:
                                               outline="white",fill="#ffe6b3", width=2)
         return womanleg
     
-    def createHead(self, vx=1, vy=1):
+    def createHead(self, img, vx=1, vy=1):
         self.vx = vx
         self.vy = vy
-        head =  self.canvas.create_oval(self.pcen[0]-20,self.pcen[1]-100,self.pcen[0]+20,self.pcen[1]-60, outline="yellow", fill='#ffe6b3')
+        #self.file = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png"])
+        # self.file = "2.png"
+        #self.image = PhotoImage(file=self.file, master = self.space, width = 150, height = 150)
+        
+        #file = 'berk.png'
+        #img = PhotoImage(file=file, master = self.canvas, width = 150, height = 150)
+        #img = PhotoImage(file=file, master = self.space, width = 150, height = 150)
+        
+        #head =  self.canvas.create_oval(self.pcen[0]-20,self.pcen[1]-100,self.pcen[0]+20,self.pcen[1]-60, outline="yellow", fill='#ffe6b3')
+        #self.image = img
+        head = self.canvas.create_image(self.pcen[0]-20,self.pcen[1]-100,image=img,anchor=NW)
         return head
         
     def createHeadF(self, vx=1, vy=1):
