@@ -36,7 +36,8 @@ def resize_cut_and_alpha_image(file_name, new_height, new_width):
     #cut circle here
     b_channel, g_channel, r_channel = cv2.split(resized)
     alpha_channel = np.zeros((new_width, new_height,1), dtype='uint8')      #add alpha channel; in ones multiply e.g. *100
-    cv2.ellipse(alpha_channel, (int(new_width/2), int(new_height/2)), (int(new_width/2), int(new_height/2)), 0, 0 , 360, (255), -1)     #draw circle
+    CenterAndAxes = (int(new_width/2)-2, int(new_height/2)-2)
+    cv2.ellipse(alpha_channel, (int(new_width/2)-1, int(new_height/2)-1), (int(new_width/2)-2, int(new_height/2)-2), 0, 0 , 360, (255), -1)     #draw circle
     img_BGRA = cv2.merge((b_channel, g_channel, r_channel, alpha_channel))   
     maskedImg = cv2.bitwise_and(img_BGRA, img_BGRA, mask=alpha_channel)
     #show_img(alpha_channel, "alpha image")

@@ -95,7 +95,7 @@ def create_random(space, true_center, names=[]):
     humans = []
     for key, name in enumerate(names):
         center=(random.randrange(150, 1266), random.randrange(200, 668))
-        center = true_center #(660, 400)
+        #center = true_center #(660, 400)
         face_img = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png", ""])
         human = anime.human(name, "male", face_img)
         human.setCenter(space, center)
@@ -130,8 +130,8 @@ def main():
     #the_one.say_something(spacex, "some title")
     the_one.move(spacex, 'up', 1)
     
-    while True:
-    #for x in range(1):
+    #while True:
+    for x in range(0):
         for the_one in humans_all:
             the_one.jump(spacex, 100, 40, 5)
             the_one.jump(spacex, 100, 80, 5)
