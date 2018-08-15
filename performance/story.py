@@ -2,14 +2,14 @@
 import random
 import animation_class as anime
 import sys
-from PIL import ImageGrab
+from PIL import ImageGrab, Image
 import os
 import sys
 
 def script_path():
     '''change current path to script one'''
     path = os.path.realpath(os.path.dirname(sys.argv[0]))
-    os.chdir(path)  #it seems to be quite important
+    os.chdir(path)
     return path
 
 def some_story():
@@ -96,7 +96,8 @@ def create_random(space, true_center, names=[]):
     for key, name in enumerate(names):
         center=(random.randrange(150, 1266), random.randrange(200, 668))
         center = true_center #(660, 400)
-        human = anime.human(name, "male")
+        face_img = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png", "", ""])
+        human = anime.human(name, "male", face_img)
         human.setCenter(space, center)
         human.makePart(space)
         human.move(space, 'down', 1)
@@ -118,7 +119,7 @@ def main():
     
     #humans_names = ["steve" + str(x) for x in range(2500)]
     spacex = anime.myhand()
-    creator = anime.human('creator', 'male')        #creator itself
+    creator = anime.human('creator', 'male', '')        #creator itself
     #creator.makeDecoration(spacex)
     humans_all = create_random(space=spacex, true_center=(200, 500), names=humans_names[:])
     #humans_all = create_random(space=spacex, true_center=(600, 200), names=humans_names[:5])
@@ -162,4 +163,10 @@ def main():
 if __name__ == "__main__":
     main()
     #some_story()
-    
+
+'''    
+todo:
+    -rezie image
+    -cut circle
+    -make alpha channel
+'''

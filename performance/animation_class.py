@@ -11,6 +11,7 @@ import random
 from PIL import ImageGrab, Image
 import os
 import sys
+import cv2
 
 def script_path():
     '''change current path to script one'''
@@ -20,14 +21,18 @@ def script_path():
 
 class human:
 
-    def __init__(self, name, sex):
+    def __init__(self, name, sex, face_img):
         self.name = name
         self.sex = sex
 
-        self.file = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png"])
+        #self.file = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png"])
+        self.file = face_img
         # self.file = "2.png"
         #self.image = PhotoImage(file=self.file, master = self.space, width = 150, height = 150)
-        self.image = PhotoImage(file=self.file, width = 150, height = 150)
+        if self.file:
+            self.image = PhotoImage(file=self.file, width = 150, height = 150)
+        else:
+            self.image = ""
         
     def makePart(self, spacex):
         if (self.sex == "male"):
@@ -96,12 +101,8 @@ class myhand:
         self.space = Tk()
         #self.space = Toplevel()
         self.canvas = Canvas(self.space, width=self.screenWidth, height=self.screenHeight)
-        self.canvas.config(bg="green")
+        self.canvas.config(bg="blue")
         self.canvas.pack()
-        
-        # self.file = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png"])
-        # self.file = "2.png"
-        # self.image = PhotoImage(file=self.file, master = self.space, width = 150, height = 150)
         #mirroring reverse
         self.vx, self.vy = 1, 1
         self.x, self.y = 1, 1
@@ -234,17 +235,10 @@ class myhand:
     def createHead(self, img, vx=1, vy=1):
         self.vx = vx
         self.vy = vy
-        #self.file = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png"])
-        # self.file = "2.png"
-        #self.image = PhotoImage(file=self.file, master = self.space, width = 150, height = 150)
-        
-        #file = 'berk.png'
-        #img = PhotoImage(file=file, master = self.canvas, width = 150, height = 150)
-        #img = PhotoImage(file=file, master = self.space, width = 150, height = 150)
-        
-        #head =  self.canvas.create_oval(self.pcen[0]-20,self.pcen[1]-100,self.pcen[0]+20,self.pcen[1]-60, outline="yellow", fill='#ffe6b3')
-        #self.image = img
-        head = self.canvas.create_image(self.pcen[0]-20,self.pcen[1]-100,image=img,anchor=NW)
+        if img:
+            head = self.canvas.create_image(self.pcen[0]-40,self.pcen[1]-130,image=img,anchor=NW)
+        else:
+            head =  self.canvas.create_oval(self.pcen[0]-20,self.pcen[1]-100,self.pcen[0]+20,self.pcen[1]-60, outline="yellow", fill='#ffe6b3')
         return head
         
     def createHeadF(self, vx=1, vy=1):
@@ -391,8 +385,8 @@ class myhand:
     
 if __name__ == "__main__":
     spacex = myhand()
-    stranger = human("( ͡° ͜ʖ ͡°)", 'male')
-    kate = human("kate", "female")
+    stranger = human("( ͡° ͜ʖ ͡°)", 'male', '')
+    kate = human("kate", "female", '')
     kate.makeDecoration(spacex)
     kate.openCurtain(spacex, openSpeed="fast")
     
