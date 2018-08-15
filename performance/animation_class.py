@@ -49,7 +49,7 @@ class human:
             self.rightleg = spacex.createLegF(vx=-1)
             self.leftleg = spacex.createLegF(vx=1)
             self.body = spacex.createBodyF()
-            self.head = spacex.createHeadF()
+            self.head = spacex.createHeadF(img=self.image)
             self.humanname = spacex.printName(self.name)
         else:
             print('what kind of monster is this?')    
@@ -242,20 +242,25 @@ class myhand:
             head =  self.canvas.create_oval(self.pcen[0]-20,self.pcen[1]-100,self.pcen[0]+20,self.pcen[1]-60, outline="yellow", fill='#ffe6b3')
         return head
         
-    def createHeadF(self, vx=1, vy=1):
+    def createHeadF(self, img, vx=1, vy=1):
         self.vx = vx
         self.vy = vy
-        head =  self.canvas.create_oval(self.pcen[0]-20,self.pcen[1]-100,self.pcen[0]+20,self.pcen[1]-60, outline="yellow", fill='#ffe6b3')
-        
-        hairline01 = (self.pcen[0]-25, self.pcen[1]-105, self.pcen[0]+13, self.pcen[1]-70 )
-        hairline02 = (self.pcen[0]+25, self.pcen[1]-105, self.pcen[0]-13, self.pcen[1]-70)
-        hairline03 = (self.pcen[0]-20, self.pcen[1]-100, self.pcen[0]+13, self.pcen[1]-70)
-        hairline04 = (self.pcen[0]-15, self.pcen[1]-95, self.pcen[0]+13, self.pcen[1]-70)
-        hair01 = self.canvas.create_arc(hairline01, start=20, extent=220, fill="red", outline="white", width=3)
-        hair02 = self.canvas.create_arc(hairline02, start=-40, extent=150, fill="red", outline="yellow", width=3)
-        hair03 = self.canvas.create_arc(hairline03, start=60, extent=150, outline="#66ff66", width=2, style="arc")
-        hair04 = self.canvas.create_arc(hairline04, start=60, extent=150, outline="#66ff66", width=2, style="arc")
-        return head, hair01, hair02, hair03, hair04    
+        if img:
+            #something
+            head = self.canvas.create_image(self.pcen[0]-40,self.pcen[1]-130,image=img,anchor=NW)
+            return head
+        else:
+            head =  self.canvas.create_oval(self.pcen[0]-20,self.pcen[1]-100,self.pcen[0]+20,self.pcen[1]-60, outline="yellow", fill='#ffe6b3')
+            
+            hairline01 = (self.pcen[0]-25, self.pcen[1]-105, self.pcen[0]+13, self.pcen[1]-70 )
+            hairline02 = (self.pcen[0]+25, self.pcen[1]-105, self.pcen[0]-13, self.pcen[1]-70)
+            hairline03 = (self.pcen[0]-20, self.pcen[1]-100, self.pcen[0]+13, self.pcen[1]-70)
+            hairline04 = (self.pcen[0]-15, self.pcen[1]-95, self.pcen[0]+13, self.pcen[1]-70)
+            hair01 = self.canvas.create_arc(hairline01, start=20, extent=220, fill="red", outline="white", width=3)
+            hair02 = self.canvas.create_arc(hairline02, start=-40, extent=150, fill="red", outline="yellow", width=3)
+            hair03 = self.canvas.create_arc(hairline03, start=60, extent=150, outline="#66ff66", width=2, style="arc")
+            hair04 = self.canvas.create_arc(hairline04, start=60, extent=150, outline="#66ff66", width=2, style="arc")
+            return head, hair01, hair02, hair03, hair04    
     
     def createShoes(self, vx=1, vy=1):
         self.vx = vx

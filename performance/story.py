@@ -120,24 +120,39 @@ def check_sex(nick):
     
 def create_random(space, true_center, names):
     humans = []
+    centers = []
     for key, (nick, face_img) in enumerate(names.items()):
-        center=(random.randrange(150, 1266), random.randrange(200, 608))
+        '''
+        while True:
+            center=(random.randrange(50, 1300), random.randrange(200, 608))
+            if input('center ok: {}? nick: {} (Yes/no)'.format(center, nick)).lower() != 'no':
+                break
+        '''
         #center = true_center #(660, 400)
+        center=(random.randrange(50, 1300), random.randrange(200, 608))
+        
         
         #face_img = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png", ""])
         sex, _ = check_gender_by_nick.check_sex(nick)       #it returns tuple
-        print(sex)
         human = anime.human(nick, sex, face_img)
         human.setCenter(space, center)
         human.makePart(space)
         human.move(space, 'down', 1)
         if key%2 == 0:
             #human.move(space, 'up', 2)
-            human.move(space, 'right', 20 + 0*key)
-            human.move(space, 'down', 20)
+            human.move(space, 'right', 0 + 0*key)
+            human.move(space, 'down', 0)
         else:
             #human.move(space, 'down', 2)
-            human.move(space, 'left', 20 + 0*key)       
+            human.move(space, 'left', 0 + 0*key)
+        while True:
+            if input('move anon: {} (yes/No)?\n'.format(nick)).lower() == 'yes':
+                to_move = (input('make move (e.g. left 10):\n')).split()
+                side = to_move[0]
+                value = int(to_move[1])
+                human.move(space, side, value)
+            else:
+                break        
         humans.append(human)
     return humans
     
@@ -192,11 +207,12 @@ def main():
 
 def vikop_story():
     path = script_path()
-    nicks = '''@anheli @jozemjo @Arveit @Raptorini @Marterr_ @s0msiad
-               @Kulturalny_Jegomosc90 @milicja @Slacky @Faiko @Piter93
-               @archol039 @7845 @namzio @Rodzynek_w_serniku @Smutny_Daltonista
-               @Efilnikufesin @Derisor @aceXgod'''
-    #nicks = '''@anheli @jozemjo'''
+    nicks = '''@Arveit @Raptorini @Marterr_ @s0msiad
+               @Kulturalny_Jegomosc90 @milicja @Slacky @Faiko
+               @7845 @namzio @Rodzynek_w_serniku @Smutny_Daltonista
+               @Efilnikufesin @aceXgod mopig, Antyfeminista,
+               TriangulumAustrale stranger13'''
+    #nicks = '''TriangulumAustrale'''
     nick_list, to_call = convert_nick_str_to_list(nicks)
     avatars_paths = save_avatars(nick_list, subdir='avatars')       #in normal size
     avatars_paths = {key: alpha_image(value, 80, 80, 'circle_avatars') for key, value in avatars_paths.items()}     #resize, circle, alpha channel
