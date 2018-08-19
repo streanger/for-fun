@@ -12,6 +12,7 @@ from PIL import ImageGrab, Image
 import os
 import sys
 import cv2
+import numpy as np
 
 def script_path():
     '''change current path to script one'''
@@ -67,6 +68,9 @@ class human:
     def jump(self, spacex, a_factor, b_factor, step):
         spacex.jump(self.parts, a_factor, b_factor, step)
     
+    def get_position(self, spacex):
+        return spacex.parts_position(self.parts)
+    
     def say_something(self, spacex, some_text):
         spacex.putTitle(some_text)
     
@@ -86,6 +90,9 @@ class human:
         self.decoration = [self.leftcurtain,
                            self.rightcurtain]            
     
+    def make_ground(self, spacex, level):
+        self.ground = spacex.make_ground(level)
+    
     def openCurtain(self, spacex, openSpeed="normal", direct="open"):
         spacex.openCurtain(self.decoration, openSpeed, direct)
     
@@ -94,8 +101,12 @@ class myhand:
     
     def __init__(self, bg_color, line_size):
         #make canvas
-        self.screenWidth = 1366
-        self.screenHeight = 768
+        if False:
+            self.screenWidth = 1920
+            self.screenHeight = 1080
+        else:
+            self.screenWidth = 1366
+            self.screenHeight = 768            
         #self.screenWidth = 600
         #self.screenHeight = 400
         self.space = Tk()
@@ -154,6 +165,16 @@ class myhand:
                     self.canvas.pack()
                     self.canvas.update()
     
+    def parts_position(self, parts):
+        '''get mean positions of all parts'''
+        all_coords = []
+        for part in parts:
+            all_coords.extend(self.canvas.coords(part))
+            #print(part, self.canvas.coords(part))
+        all_coords = np.reshape(all_coords, (-1, 2))
+        x_pos, y_pos = [np.mean(item) for item in zip(*all_coords)]
+        return x_pos, y_pos
+            
     def jump(self, parts, a_factor, b_factor, step):
         jump_path = [round(-a_factor*((x*0.1)**2)+b_factor) for x in range(-b_factor, b_factor)]
         jump_path = [item for item in jump_path if item > 0]
@@ -173,9 +194,10 @@ class myhand:
                     self.canvas.move(part, step, -value)    #just part not every single thing
                     self.canvas.pack()
                     self.canvas.update()
-            #file = "shot_" + str(round(time.time(),3)) + ".jpg"
+            #file = "shot_" + str(round(time.time(),4)*10000) + ".jpg"
             #file_path = os.path.join("animation", file)
             #ImageGrab.grab((30,100,1000,700)).save(file_path)
+            #time.sleep(0.001)
             #input("key {} value {}".format(key, value))
     
     def setCenter(self, xpoint, ypoint):
@@ -328,7 +350,18 @@ class myhand:
                                             fill="brown", width=self.line_size)
                                             
         return groundline, ground, bluesky
-        
+    
+    def make_ground(self, level):
+        ground = self.canvas.create_polygon(0,self.screenHeight - level,
+                                            self.screenWidth,self.screenHeight - level,
+                                            self.screenWidth,self.screenHeight,
+                                            0,self.screenHeight,
+                                            fill="green", width=self.line_size)
+        groundline = self.canvas.create_line(0,self.screenHeight - level,
+                                            self.screenWidth,self.screenHeight - level,
+                                            fill="brown", width=5)
+        return ground, groundline
+    
     def createCurtain(self, vx=0, vy=1):
         self.vx = vx
         self.vy = vy
@@ -393,7 +426,7 @@ class myhand:
             
     
 if __name__ == "__main__":
-    spacex = myhand()
+    spacex = myhand(bg_color="black", line_size=2)
     stranger = human("( ͡° ͜ʖ ͡°)", 'male', '')
     kate = human("kate", "female", '')
     kate.makeDecoration(spacex)
@@ -404,7 +437,7 @@ if __name__ == "__main__":
     movement = '4444333333324242424111111111111'    
     for moves in movement:
         for move in moves:
-            stranger.move(spacex, str(move))
+            stranger.move(spacex, str(move), 50)
     
     kate.makeDecoration(spacex, full=False)
     kate.openCurtain(spacex, openSpeed="fast", direct="close")

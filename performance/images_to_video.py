@@ -40,6 +40,7 @@ def make_video(images, outvid="video.avi", fps=5, size=None,
 if __name__ == "__main__":
     path = script_path()
     args = sys.argv[1:]
+    args = ['animation']
     dir = args[0]
     images = get_files(dir)
     if not images:

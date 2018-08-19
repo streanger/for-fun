@@ -8,6 +8,7 @@ import sys
 from alpha_image import alpha_image
 from wykop_avatars import convert_nick_str_to_list, save_avatars
 import check_gender_by_nick
+import numpy as np
 
 def script_path():
     '''change current path to script one'''
@@ -128,8 +129,8 @@ def create_random(space, true_center, names):
             if input('center ok: {}? nick: {} (Yes/no)'.format(center, nick)).lower() != 'no':
                 break
         '''
-        #center = true_center #(660, 400)
-        center=(random.randrange(50, 1300), random.randrange(200, 608))
+        center = true_center #(660, 400)
+        #center=(random.randrange(50, 1300), random.randrange(200, 608))
         
         
         #face_img = random.choice(["fizzix.png", "forch.png", "berk.png", "Fortyk.png", "fojteqkloc.png", ""])
@@ -145,7 +146,7 @@ def create_random(space, true_center, names):
         else:
             #human.move(space, 'down', 2)
             human.move(space, 'left', 0 + 0*key)
-        while True:
+        while False:
             if input('move anon: {} (yes/No)?\n'.format(nick)).lower() == 'yes':
                 to_move = (input('make move (e.g. left 10):\n')).split()
                 side = to_move[0]
@@ -205,6 +206,20 @@ def main():
     out = [human.move(spacex, 'right', 225) for human in humans_04]
     '''
 
+def random_jump(space, jumper):    
+    rand_speed = random.randrange(10, 100)
+    rand_high = random.randrange(600)
+    current_position = jumper.get_position(space)[0]
+    if current_position > (space.screenWidth)-100:
+        rand_dist = random.randrange(-20, 0)
+    elif current_position < 100:
+        rand_dist = random.randrange(20)
+    else:
+        rand_dist = random.randrange(-20, 20)
+    print("current_position(x): {}, speed: {}, high: {}, distance: {}".format(current_position, rand_speed, rand_high, rand_dist))
+    jumper.jump(space, rand_speed, rand_high, rand_dist)
+    return True
+  
 def vikop_story():
     path = script_path()
     nicks = '''@Arveit @Raptorini @Marterr_ @s0msiad
@@ -213,6 +228,7 @@ def vikop_story():
                @Efilnikufesin @aceXgod mopig, Antyfeminista,
                TriangulumAustrale stranger13'''
     #nicks = '''TriangulumAustrale'''
+    nicks = 'stranger13'
     nick_list, to_call = convert_nick_str_to_list(nicks)
     avatars_paths = save_avatars(nick_list, subdir='avatars')       #in normal size
     avatars_paths = {key: alpha_image(value, 80, 80, 'circle_avatars') for key, value in avatars_paths.items()}     #resize, circle, alpha channel
@@ -220,12 +236,25 @@ def vikop_story():
     print(humans_names)
     
     spacex = anime.myhand(bg_color="black", line_size=2)
+    screenHeight = spacex.screenHeight
     creator = anime.human('creator', 'male', '')        #creator itself
     #creator.makeDecoration(spacex)
-    creator.say_something(spacex, "armia przegrywów V2.0")
+    creator.make_ground(spacex, level=90)
+    #creator.say_something(spacex, "armia przegrywów V2.0")
     
-    humans_all = create_random(space=spacex, true_center=(200, 500), names=avatars_paths)
-    
+    humans_all = create_random(space=spacex, true_center=(200, screenHeight-170), names=avatars_paths)
+    #for x in range(40):
+    while True:
+        for key, the_one in enumerate(humans_all):
+            random_jump(spacex, the_one)
+            # the_one.jump(spacex, 20, 40, 5)
+            # the_one.jump(spacex, 10, 80, 5)
+            # the_one.jump(spacex, 100, 560, 10+key)
+            # the_one.jump(spacex, 100, 250, 20)
+            # the_one.jump(spacex, 100, 250, -20+key)
+            # the_one.jump(spacex, 20, 160, -10)
+            # the_one.jump(spacex, 100, 80, -5)
+            # the_one.jump(spacex, 100, 40, -5)
     
     #download avatars
     #convert avatars size and alpha; save it to specified dir
