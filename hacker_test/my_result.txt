@@ -1,0 +1,7 @@
+15.10.2018 23:42
+my result for now:
+
+Your total score is: 0x04e/0x200 (78/512)
+You are: "an Operator"
+
+>>>
