@@ -2,7 +2,7 @@
 import time
 
 def mechanic_write(str_content, type_time):
-    ''' everything you put as var 'str_content' is converted to string '''
+    ''' typing sign by sign, with time sleep between; everything you put as var 'str_content' is converted to string '''
     for item in str(str_content):
         print("{}".format(item), end="", flush=True)
         time.sleep(type_time)
