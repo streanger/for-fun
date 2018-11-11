@@ -1,7 +1,9 @@
+''' mechanic typing function '''
 import time
 
 def mechanic_write(str_content, type_time):
-    for item in str_content:
+    ''' everything you put as var 'str_content' is converted to string '''
+    for item in str(str_content):
         print("{}".format(item), end="", flush=True)
         time.sleep(type_time)
     print()
