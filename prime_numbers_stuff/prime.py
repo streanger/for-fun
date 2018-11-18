@@ -82,28 +82,32 @@ def check_prime(list_data):
                     break
         if counter == 1:
             yield x
-            
+
+def digits_sum(number):
+    return sum([int(item) for item in list(str(number))])
+    
 def gen_diff(data, var):
     out = []
     left = data[::2]
     right = data[1::2]
-    for key, _ in enumerate(left):
-        left_sum = sum(left[:key])
-        left_sum_up = sum(left[:key+1])
-        right_sum = sum(right[:key])
-        # print("{}. {} {} {} {}".format(key, left_sum, right_sum, (left_sum - right_sum), (left_sum + left_sum_up - 2*right_sum)))
-        # print(left[key], right[key])
-        # print("{}. {}".format(key, (left_sum + left_sum_up - 2*right_sum)))
+    for key, _ in enumerate(left[:-1]):         # -1 is to prevent different lenght of columns
         if var == 1:
+            left_sum = sum(left[:key])
+            left_sum_up = sum(left[:key+1])
+            right_sum = sum(right[:key])
+            # print("{}. {} {} {} {}".format(key, left_sum, right_sum, (left_sum - right_sum), (left_sum + left_sum_up - 2*right_sum)))
+            # print(left[key], right[key])
+            # print("{}. {}".format(key, (left_sum + left_sum_up - 2*right_sum)))
             out.append(left_sum + left_sum_up - 2*right_sum)
         elif var == 2:
-            out.append(left_sum + left_sum_up - 2*right_sum)
+            out.append(left[key] - right[key])
+            print(left[key], right[key])
         elif var == 3:
-            out.append(left_sum + left_sum_up - 2*right_sum)
+            out.append(digits_sum(left[key]) + digits_sum(right[key]))
         elif var == 4:
-            out.append(left_sum + left_sum_up - 2*right_sum)
+            out.append(left[key] - right[key])
         else:
-            out.append(left_sum + left_sum_up - 2*right_sum)
+            out.append(left[key] - right[key])
     # print()
     return out
     
@@ -114,7 +118,7 @@ def print_column(data):
     return True
 
 def draw_chart(data, subtitle="example name"):
-    plt.plot(data)
+    plt.plot(data, linewidth=0.5)
     plt.ylabel("diff between pairs")
     plt.xlabel("number/2")
     plt.grid()
@@ -140,12 +144,10 @@ def main():
     data_file = "total.txt"
     # files = [item for item in os.listdir() if item.endswith(".txt") and item != data_file]
     # concat_files(files)
-    # sys.exit()
+
     data = read_prime_from_file(data_file)     # read from file
-    data = data[:2000]
-    diff = gen_diff(data, 1)
-    # create some data
-    # diff = gen_diff(data, 2)
+    # data = data[:20000]
+    diff = gen_diff(data, 3)                   # create different types of data
     draw_chart(diff, subtitle="prime number pairs diff from <{}>".format(data_file))
     return True
     
@@ -153,7 +155,7 @@ def main():
 if __name__ == "__main__":
     path = script_path()
     main()
-    # gen_prime_to_file("prime_numbers.txt")
+    # gen_prime_to_file("total.txt")            # it will continue to append new numbers
     
     
     
