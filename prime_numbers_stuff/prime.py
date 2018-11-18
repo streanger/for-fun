@@ -19,16 +19,16 @@ def simple_read(file_name):
         file_content = []
     return file_content
 
-def simple_write(file, str_content):
+def simple_write(file, str_content, mode):
     '''simple_write data to .txt file, with specified strContent'''
-    with open(file, "w", encoding="utf-8") as f:
+    with open(file, mode, encoding="utf-8") as f:
         f.write(str_content + "\n")
         f.close()
     return True
     
 def concat_files(files):
     out = "\n".join([simple_read(file).strip() for file in files])
-    simple_write("total.txt", out)
+    simple_write("total.txt", out, "w")
     return True
 
 def gen_prime(start, stop):
@@ -43,9 +43,34 @@ def gen_prime(start, stop):
                 if counter > 1:
                     break
         if counter == 1:
-            # yield x
-            print(x)
-            
+            yield x
+
+def gen_prime_to_file(file):
+    ''' it checks the last number and continue '''
+    script_path()
+    print("< prime numbers generate in progress >")
+    while True:
+        # check the last item
+        lastItem = read_prime_from_file(file)
+        if lastItem:
+            lastItem = lastItem[-1] + 1
+        else:
+            lastItem = 2
+        start = lastItem
+        stop = lastItem + 100000
+        if start < 2:
+            start = 2
+        for x in range(start, stop+1):
+            counter = 0
+            for divider in range(2, x+1):
+                if x % divider == 0:
+                    counter += 1
+                    if counter > 1:
+                        break
+            if counter == 1:
+                simple_write(file, str(x), mode='a')
+    return True
+    
 def check_prime(list_data):
     ''' check if items in list are prime '''
     for x in list_data:
@@ -58,7 +83,7 @@ def check_prime(list_data):
         if counter == 1:
             yield x
             
-def gen_diff(data):
+def gen_diff(data, var):
     out = []
     left = data[::2]
     right = data[1::2]
@@ -69,7 +94,16 @@ def gen_diff(data):
         # print("{}. {} {} {} {}".format(key, left_sum, right_sum, (left_sum - right_sum), (left_sum + left_sum_up - 2*right_sum)))
         # print(left[key], right[key])
         # print("{}. {}".format(key, (left_sum + left_sum_up - 2*right_sum)))
-        out.append(left_sum + left_sum_up - 2*right_sum)
+        if var == 1:
+            out.append(left_sum + left_sum_up - 2*right_sum)
+        elif var == 2:
+            out.append(left_sum + left_sum_up - 2*right_sum)
+        elif var == 3:
+            out.append(left_sum + left_sum_up - 2*right_sum)
+        elif var == 4:
+            out.append(left_sum + left_sum_up - 2*right_sum)
+        else:
+            out.append(left_sum + left_sum_up - 2*right_sum)
     # print()
     return out
     
@@ -103,22 +137,24 @@ def read_prime_from_file(file):
     return [int(item) for item in file_content if item.strip()]
     
 def main():
-    path = script_path()
-    begin = time.time()
-    # some = list(gen_prime(0, 2000))           # generate from function
     data_file = "total.txt"
-    files = [item for item in os.listdir() if item.endswith(".txt") and item != data_file]
-    concat_files(files)
+    # files = [item for item in os.listdir() if item.endswith(".txt") and item != data_file]
+    # concat_files(files)
+    # sys.exit()
     data = read_prime_from_file(data_file)     # read from file
-    diff = gen_diff(data)
+    data = data[:2000]
+    diff = gen_diff(data, 1)
+    # create some data
+    # diff = gen_diff(data, 2)
     draw_chart(diff, subtitle="prime number pairs diff from <{}>".format(data_file))
-    print("time elapsed: {}".format(time.time() - begin))
-    # print_column(some)
+    return True
     
     
 if __name__ == "__main__":
+    path = script_path()
     main()
-    # gen_prime(300000, 600000)
+    # gen_prime_to_file("prime_numbers.txt")
+    
     
     
     
