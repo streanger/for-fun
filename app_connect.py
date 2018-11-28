@@ -1,5 +1,6 @@
 '''
-connect with running app, and use it with clicks
+-connect with running app, and use it with clicks
+-just an example
 '''
 import os
 import sys
