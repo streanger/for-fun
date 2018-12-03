@@ -1,6 +1,11 @@
 import sys
 import ctypes
 
+'''
+info about functions in most common dlls:
+https://www.win7dll.info/user32_dll.html
+'''
+
 def help_content():
     some = '''{}
     usage:
