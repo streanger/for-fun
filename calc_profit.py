@@ -14,7 +14,7 @@ def calc_profit(dailyProfit, peopleNumber):
 if __name__ == "__main__":
     dailyProfit = 20
     peopleNumber = 30
-    out = calc_profit(20, 30)
+    out = calc_profit(dailyProfit, peopleNumber)
     print("daily profit per one person: {} [s]\nnumber of people: {}\ntotal time profit during one year: {} [h]".format(dailyProfit,
                                                                                                                       peopleNumber,
                                                                                                                       round(out,2)))
