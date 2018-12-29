@@ -50,13 +50,37 @@ class worker():
             when you are in fire range in front of npc shoot instead of run away
             treat npc like a bullet
             find out how long the ray really is(check metal or tinywall between)
+            
+            ignore if bullet is going outside
+            if x=0 and turn left
+            if x=480 and turn right
+            if y=0 and turn up
+            if y=480 and turn down
         '''
-        in_front_range = 24 # 16
+        in_front_range = 16 # 16
         try:
             # if data['type'] == 'bullet':
             if data['type'] in ('bullet', 'npc'):
                 # bullet = (data['direction'], (data['position']['x'], data['position']['y']))
                 bullet = (data['direction'], data['position'])
+                
+                # *************************************************
+                # this might works
+                if bullet[1]['x'] < 32 and bullet[0] == 'left':
+                    return False
+                if bullet[1]['x'] > 448 and bullet[0] == 'right':
+                    return False
+                if bullet[1]['y'] < 32 and bullet[0] == 'up':
+                    return False
+                if bullet[1]['y'] > 448 and bullet[0] == 'down':
+                    return False
+                # *************************************************
+                
+                # check parent
+                if data['parent'] == self.player_id:
+                    simple_write('strange_things.txt', "\tTRY TO AVOID BULLET OF YOURS")
+                    return False
+                
                 if bullet[0] in ('left', 'right'):
                     if bullet[0] == 'left':
                         if bullet[1]['y'] in range(player_pos[1]-in_front_range, player_pos[1]+in_front_range):
@@ -100,7 +124,18 @@ class worker():
                                 if self.current_turn == 'down':
                                     return 'shoot'      # attack is the best defence
                                 else:
-                                    return choice(['left', 'right'])   # for now
+                                    # ******************************************************
+                                    # use it in whole function if works
+                                    # metal_object = self.check_items_between(player_pos, npc_pos, self.metal_positions, 32, vertical=True)    # check_metal
+                                    metal_object = self.check_items_between(player_pos, (bullet[1]['x'], bullet[1]['y']), self.metal_positions, 32, vertical=True)    # check_metal
+                                    tinywall_object = self.check_items_between(player_pos, (bullet[1]['x'], bullet[1]['y']), self.tinywall_positions, 32, vertical=True)    # check_metal
+                                    if metal_object or tinywall_object:
+                                        simple_write('strange_things.txt', "\tFALSE BULLET RAY, METAL OBJECTS or TINYWALL BETWEEN: {}, {}".format(metal_object, tinywall_object))
+                                        return False
+                                    else:
+                                        simple_write('strange_things.txt', "\tTRY TO AVOID BULLET RAY FROM: {}".format('down'))
+                                        return choice(['left', 'right'])   # for now
+                                    # ******************************************************
                             
                         if (player_pos[0] - bullet[1]['x']) in range(16, 48) and self.current_turn == 'left':
                             if player_pos[1] in range(0, bullet[1]['y']):
@@ -117,7 +152,17 @@ class worker():
                                 if self.current_turn == 'up':
                                     return 'shoot'      # attack is the best defence
                                 else:
-                                    return choice(['left', 'right'])   # for now
+                                    # ******************************************************
+                                    # use it in whole function if works
+                                    # metal_object = self.check_items_between(player_pos, npc_pos, self.metal_positions, 32, vertical=True)    # check_metal
+                                    metal_object = self.check_items_between(player_pos, (bullet[1]['x'], bullet[1]['y']), self.metal_positions, 32, vertical=True)    # check_metal
+                                    if metal_object:
+                                        simple_write('strange_things.txt', "\tFALSE BULLET RAY, METAL OBJECTS BETWEEN: {}".format(metal_object))
+                                        return False
+                                    else:
+                                        simple_write('strange_things.txt', "\tTRY TO AVOID BULLET RAY FROM: {}".format('up'))
+                                        return choice(['left', 'right'])   # for now
+                                    # ******************************************************
                             
                         if (player_pos[0] - bullet[1]['x']) in range(16, 48) and self.current_turn == 'left':
                             if player_pos[1] in range(bullet[1]['y'], 480):
@@ -238,6 +283,7 @@ class worker():
             
         if abs(player_pos_y - npc_pos_y) < diff_value:
             # left/right
+            simple_write("strange_things.txt", "player vs npc [y]: {} {}".format(player_pos_y, npc_pos_y))
             out = self.check_items_between(player_pos, npc_pos, self.metal_positions, 32, vertical=False)    # check_metal
             tinywall_object = self.check_items_between(player_pos, npc_pos, self.tinywall_positions, 8, vertical=False)    # check_tinywall
             if out:
@@ -248,7 +294,6 @@ class worker():
                 return False
                 
             if player_pos_x > npc_pos_x:
-            # if player_pos_x < npc_pos_x:
                 # turn left
                 # get player position
                 # shoot or turn
@@ -323,6 +368,7 @@ class Game(object):
             
             # read action from object
             action = self.player.current_action
+            simple_write("strange_things.txt", "action: {}".format(action))
             print("\n\n\t\t\t\t\taction: '{}'\n\n".format(action))
             if action and self.player.counter > 15:
                 # input("here" + self.player.counter)
@@ -341,12 +387,12 @@ class Game(object):
                 elif action == 'stop':
                     await self.send(action='set_speed', speed=0)
                 else:
-                    pass
+                    await self.send(action='shoot')
                     
                 # clear action after send
                 self.player.current_action = ''
             else:
-                if self.player.counter > 10:
+                if self.player.counter > 15:
                     # print("counter: {}".format(self.player.counter))
                     await self.send(action='set_speed', speed=1)
                     # await self.send(action='shoot')
@@ -459,13 +505,15 @@ async def handle_client(loop):
         npc_pos = game.player.get_npc_pos(data)
         currentTurn = game.player.get_current_turn(data)
         action = game.player.check_way(player_pos, npc_pos, currentTurn)
+        # simple_write("strange_things.txt", "{}, {}".format(game.player.counter, action))    # this should help with strange actions at start
         if action:
             game.player.current_action = action         # this cause he is turn after few strikes
             
         bullet_avoid = game.player.find_rays(data, player_pos)
         if bullet_avoid:
             print("\n\n\n\t\t\t\t\t\tBULLET RAY AVOIDED: {}\n\n\n".format(bullet_avoid))
-            simple_write('bullet_ray.txt', (data, player_pos))
+            simple_write('strange_things.txt', "\tBULLET RAY AVOIDED: {}".format(bullet_avoid))
+            # simple_write('bullet_ray.txt', (data, player_pos))
             game.player.current_action = bullet_avoid   # test for now
             
             
@@ -486,12 +534,7 @@ async def handle_client(loop):
         print("\ncurrentTurn: {}".format(currentTurn))
         # print(game.player.metal_positions)
         
-        try:
-            if (game.player.player_id in str(data)):
-                simple_write("strange_data.txt", data)
-        except:
-            pass
-        
+
         # out = 'response\\data_' + str(time.time()).split('.')[0] + str(random()).split('.')[1] + '.json'
         # if 'player' in str(data):
         # if 'bullet' in str(data):
@@ -563,7 +606,20 @@ todo (up 28.12.18):
 -get all informations in one tick
 -it will help to compare wage of critical actions like avoiding bullets or destroing npc's
 -find out why he is turn right/left after few ticks
+    its because of avoiding bullets -> need to check if metal is between
+    true reason:
+    	TRY TO AVOID BULLET RAY FROM: down
+        BULLET RAY AVOIDED: left
+    or maybe my own bullets ???
+    	TRY TO AVOID BULLET OF YOURS
+        :)
 
+todo:
+    -conflict of interests -> avoid from one fire to other
+    -at first look at the nearest enemy
+    -think of reach stable position like 32, 64, 96, not 88 v 80 which is dangerous
+        
+        
 REMEMBER:
 10kB max script size
 '''
