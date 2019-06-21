@@ -18,8 +18,13 @@ def generate_mirror(data):
     
     
 def generate_half(n):
-    out = [(n, x) for x in range((n-1), -n, -2)]
-    out.extend([(x, -n) for x in range((n-1), -n, -2)])
+    if True:
+        out = [(n, x) for x in range((n-1), -n, -2)]
+        out.extend([(x, -n) for x in range((n-1), -n, -2)])
+    else:
+        # this will make full image, not only chessboard
+        out = [(n, x) for x in range((n-1), -n, -1)]
+        out.extend([(x, -n) for x in range((n-1), -n, -1)])
     return out
     
     
