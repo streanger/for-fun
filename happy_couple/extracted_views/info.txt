@@ -1,0 +1,2 @@
+-images comes from:
+	th = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 4)        # image save in this configuration
