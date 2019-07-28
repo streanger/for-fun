@@ -1,0 +1,13 @@
+'start',
+# 'help',                               # just to simulate that you are typing commands
+'load th_view_01.png 400 400',
+'load th_view_02.png 400 376',
+'load th_view_03.png 331 139',
+'resize',                               # resize and move head 
+'loadre th_view_04.png 700 9',          # clear & load full woman in low-res
+'load th_view_05.png 326 14',           # full man on left
+'loadre th_view_06.png 326 14',         # man move hand
+'loadre th_view_07.png 326 14',         # woman move hand
+'move',                                 # man move ahead for shaking hands
+'animation',                            # final animation :)
+'refresh',
