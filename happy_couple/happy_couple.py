@@ -1,4 +1,6 @@
-''' this is script, for make animation from "revenge of the nerds" movie '''
+''' this is script, for make animation from "revenge of the nerds" movie
+    beta version done at 28.07.2019, 03:09
+'''
 import sys
 import os
 import time
@@ -7,7 +9,9 @@ import numpy as np
 import cv2
 import winsound
 
+
 def script_path():
+    ''' return and change directory, to current script path '''
     currentPath = os.path.realpath(os.path.dirname(sys.argv[0]))
     os.chdir(currentPath)
     return currentPath
@@ -50,6 +54,7 @@ def create_blank_image(height, width):
     
     
 def draw_tv_background_and_backlight(img):
+    ''' think of some funny background '''
     # file = 'old_tv.png'
     # tv = cv2.imread(file, cv2.IMREAD_UNCHANGED)
     # out = paste_image(tv, img, 0, 0)
@@ -58,6 +63,7 @@ def draw_tv_background_and_backlight(img):
     
     
 def extract_countours(img):
+    ''' i dont remember the reason of creating this function :) '''
     return True
     
     
@@ -72,6 +78,8 @@ def get_views(key):
     ''' store here all views
         think of cut single view, to parts
         store data with alpha layer
+        
+        info - not used for now
     '''
     data = {
         'view_00': 1,
@@ -83,6 +91,7 @@ def get_views(key):
     
     
 def help_content():
+    ''' commands possible for use. Need to be improved '''
     some = '''
     start                   --create window to draw image
     exit, quit              --finish drawing
@@ -92,6 +101,7 @@ def help_content():
     clear                   --clear image
     refresh                 --refresh live mode
     resize                  --resize objects
+    sound on/off            --turn on/off sound effects
     list_files              --list files from lines_only directory
     load <file> <x_pos>
          <y_pos> <size>     --load image
@@ -101,7 +111,11 @@ def help_content():
     
     
 def smooth_image(img, numberOfBlurs=5):
-    ''' https://stackoverflow.com/questions/37409811/smoothing-edges-of-a-binary-image '''
+    '''
+    based on:
+        https://stackoverflow.com/questions/37409811/smoothing-edges-of-a-binary-image
+    used for creating images
+    '''
     ret, thresh = cv2.threshold(img, 125, 255, cv2.THRESH_BINARY);
     blurredImage = cv2.pyrUp(thresh);
     for x in range(numberOfBlurs):
@@ -243,26 +257,39 @@ def generate_images():
             # input()
         cv2.destroyAllWindows()
     '''
+    
+    
+    # ************** check position - used when creating sequence **************
+    # file1, pos1, file2, pos2 = 'th_view_01.png', (400, 400), 'th_view_02.png', (400, 376)
+    # file1, pos1, file2, pos2 = 'th_view_02.png', (400, 376), 'th_view_03.png', (331, 139)
+    # file1, pos1, file2, pos2 = 'small_head.png', (736, 40), 'th_view_04.png', (700, 9)
+    # file1, pos1, file2, pos2 = 'th_view_04.png', (700, 9), 'th_view_05.png', (326, 14)
+    # file1, pos1, file2, pos2 = 'th_view_07.png', (326, 14), 'walking_man_01.png', (341, 6)
+    # file1, pos1, file2, pos2 = 'th_view_04.png', (700, 9), 'waiting_woman.png', (689, 14)
+    # file1, pos1, file2, pos2 = 'waiting_woman.png', (689, 14), 'th_view_08.png', (477, 14)
+    # file1, pos1, file2, pos2 = 'th_view_08.png', (477, 14), 'walking_man_02.png', (479, 1)
+    # file1, pos1, file2, pos2 = 'th_view_08.png', (477, 14), 'th_view_10.png', (499, 10)
+    # check_position(file1, pos1, file2, pos2)
     return True
     
     
 def create_image(height, width):
     img = np.array(range(height*width), dtype=np.uint8).reshape((width, height))        # create one layer array
-    # img = np.array(range(225), dtype=np.uint8).reshape((width, height))        # create one layer array
-    # row = np.concatenate(([img for x in range(20)]), axis=1)
-    # out = np.concatenate(([row for x in range(20)]), axis=0)
-    # out = np.stack((out,)*3, axis=-1)                                   # convert 1 layer to 3 layer (gray -> rgb)
-    out = np.stack((img,)*3, axis=-1)                                   # convert 1 layer to 3 layer (gray -> rgb)
+    out = np.stack((img,)*3, axis=-1)                                                   # convert 1 layer to 3 layer (gray -> rgb)
     return out
     
     
 def draw_parts():
-    ''' extract parts from image, which are not connected, and draw them one by one '''
+    ''' extract parts from image, which are not connected, and draw them one by one 
+        not used for now. It may change animation a lot
+    '''
     return True
     
-
+    
 def draw_up_down():
-    ''' draw image from up to down, line by line '''
+    ''' draw image from up to down, line by line
+        not used for now. It may change animation a lot
+    '''
     return True
     
     
@@ -272,7 +299,6 @@ def simple_resize_img(img, newSize):
     width = round((img.shape[1])*(newSize/100))
     resized = cv2.resize(img, (width, height))
     return resized
-    
     
     
 def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
@@ -345,6 +371,7 @@ def paste_image(smaller, bigger, x_pos, y_pos):
     
     
 def check_position(file1, pos1, file2, pos2):
+    ''' this function(like almost every other) need to be cleaned '''
     # ************** check position **************
     heightMain, widthMain = 900, 1200
     blank = create_blank_image(heightMain, widthMain)
@@ -455,7 +482,8 @@ if __name__ == "__main__":
         img = draw_tv_background_and_backlight(blank)       # draw some background(for now return the same image)
         # show_image('img', img)
         toStart = False
-        print("> type commands, to start drawing")
+        # print("> type commands, to start drawing")
+        print("> this is very strange animation")
         commandNo = 0
         while True:
             command = input("> ")
@@ -477,8 +505,11 @@ if __name__ == "__main__":
                 'refresh',
             ]
             try:
+                # 1/0   # this change sequence mode to command one
                 command = sequence[commandNo]
             except IndexError:
+                pass
+            except:
                 pass
                 
             commandNo += 1
@@ -512,7 +543,6 @@ if __name__ == "__main__":
                 img = draw_tv_background_and_backlight(blank)
                 for x in range(10):
                     # if not x%5:
-                    # sound = 'beep-21.wav'
                     sound = 'smb_touch.wav'
                     if x==3:
                         winsound.PlaySound(os.path.join('sounds', sound), winsound.SND_ALIAS | winsound.SND_ASYNC)
@@ -545,7 +575,8 @@ if __name__ == "__main__":
                 
                 # draw waiting woman on right
                 img = paste_image(woman, img, posZeroX + 689, posZeroY + 14)
-                for x in range(11):
+                # for x in range(11):
+                for x in range(21):
                     if not x:
                         # draw man on the left
                         man = cv2.imread(os.path.join('lines_only', 'walking_man_01.png'), cv2.IMREAD_UNCHANGED)
@@ -555,15 +586,18 @@ if __name__ == "__main__":
                             man = cv2.imread(os.path.join('lines_only', 'walking_man_02.png'), cv2.IMREAD_UNCHANGED)
                         else:
                             man = cv2.imread(os.path.join('lines_only', 'walking_man_03.png'), cv2.IMREAD_UNCHANGED)
-                        out = paste_image(man, img, posZeroX + 341+round(13.8*x), posZeroY + 6-1*(x//2))
+                        # out = paste_image(man, img, posZeroX + 341+round(13.8*x), posZeroY + 6-1*(x//2))
+                        out = paste_image(man, img, posZeroX + 341+round(6.9*x), posZeroY + 6-1*(x//4))
                         
                         # dst -> (479, 1)
-                        
+                    if not x%11:
+                        sound = 'smb_jump.wav'
+                        winsound.PlaySound(os.path.join('sounds', sound), winsound.SND_ALIAS | winsound.SND_ASYNC)
                     cv2.imshow('img', out)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
                     # time.sleep(0.05)
-                    time.sleep(0.1)
+                    time.sleep(0.03)
                     
                 
                 # clear screen again
@@ -572,10 +606,11 @@ if __name__ == "__main__":
                 hands = cv2.imread(os.path.join('lines_only', 'th_view_08.png'), cv2.IMREAD_UNCHANGED)
                 out = paste_image(hands, img, posZeroX + 477, posZeroY + 14)      # (477, 14) - position of pair with shaking hands
                 
+                sound = 'smb_coin.wav'
+                winsound.PlaySound(os.path.join('sounds', sound), winsound.SND_ALIAS | winsound.SND_ASYNC)
                 # print(331 + 45*x, 139 - 11*x)
                 # cv2.imwrite('small_head.png', resized)
                 img = out
-                
                 
             elif command == 'animation':
                 # print("(final animation scene is now executed)")
@@ -587,19 +622,24 @@ if __name__ == "__main__":
                 # clear screen
                 blank = create_blank_image(heightMain, widthMain)
                 img = draw_tv_background_and_backlight(blank)
+                stepSize = 25
+                steps = [x for x in range(0, 200, stepSize)] + [x for x in range(-200, 201, stepSize)][::-1] + [x for x in range(-200, 0, stepSize)][1:]
                 while True:
-                    for x in range(4):
-                        couple = cv2.imread(os.path.join('lines_only', 'th_view_1{}.png'.format(str(x))), cv2.IMREAD_UNCHANGED)     # this format is risky in some way
-                        # out = paste_image(couple, img, posZeroX + 499, posZeroY + 10)   #(it should be -> 499, 10)
-                        out = paste_image(couple, img, posZeroX + 449, posZeroY + 10)   #(it should be -> 499, 10)
-                        
-                        cv2.imshow('img', out)
-                        if cv2.waitKey(1) & 0xFF == ord('q'):
-                            break
-                        # time.sleep(0.05)
-                        time.sleep(0.25)
-                    sound = 'smb_touch.wav'
-                    winsound.PlaySound(os.path.join('sounds', sound), winsound.SND_ALIAS | winsound.SND_ASYNC)
+                    for step in steps:
+                        # print("current step: {}".format(step))
+                        for x in range(4):
+                            couple = cv2.imread(os.path.join('lines_only', 'th_view_1{}.png'.format(str(x))), cv2.IMREAD_UNCHANGED)     # this format is risky in some way
+                            # out = paste_image(couple, img, posZeroX + 499, posZeroY + 10)   #(it should be -> 499, 10)
+                            out = paste_image(couple, img, posZeroX + step + 449, posZeroY + 10)   #(it should be -> 499, 10)
+                            
+                            cv2.imshow('img', out)
+                            if cv2.waitKey(1) & 0xFF == ord('q'):
+                                break
+                            # time.sleep(0.05)
+                            time.sleep(0.25)
+                            # cv2.imwrite('happy_couple_{}.png'.format(x), out)
+                        sound = 'smb_touch.wav'
+                        winsound.PlaySound(os.path.join('sounds', sound), winsound.SND_ALIAS | winsound.SND_ASYNC)
                 # this loop never ends
                 
             elif command == 'clear':
@@ -633,8 +673,6 @@ if __name__ == "__main__":
                         resizeX = int(command.split()[-1])
                         print(resizeX)
                         loaded = simple_resize_img(loaded, resizeX)
-                        # loaded = image_resize(image, width = 400, height = None, inter = cv2.INTER_AREA)
-                        # loaded = image_resize(loaded, width = 400, height = None, inter = cv2.INTER_AREA)
                     if command.split()[0].endswith('re'):
                         blank = create_blank_image(heightMain, widthMain)
                         img = draw_tv_background_and_backlight(blank)
@@ -654,55 +692,13 @@ if __name__ == "__main__":
         cv2.destroyAllWindows()
         print("\n> drawing finished")
     else:
-            
         # ************** do something here **************
         pass
         
-        # ************** extract colored lines **************
-        # use it at the last stage
-        '''
-        lines_only = create_new_dir('lines_only')
-        paths = absoluteFilePaths('colored')
-        colors = (132, 170, 237)     # is it orange?
-        colors = (62, 158, 255)     # is it orange?
-        for file in paths:
-            img = cv2.imread(file, 1)
-            # https://pythonprogramming.net/color-filter-python-opencv-tutorial/
-            lower_green = np.array([00, 150, 00])
-            upper_green = np.array([255, 200, 255])
-            mask = cv2.inRange(img, lower_green, upper_green)   # this extracts green elements
-            B, G, R = [cv2.bitwise_and(mask+color, mask+color, mask=mask) for color in colors]
-            
-            alpha = mask*1
-            BGR = cv2.merge((B, G, R, alpha)) # join layers
-            # show_image('BGR', BGR)
-            fileOut = os.path.join(lines_only, path_last_element(file))
-            cv2.imwrite(fileOut, BGR)
-        '''
-        
-        
-        
-        
-        # ************** check position **************
-        # file1, pos1, file2, pos2 = 'th_view_01.png', (400, 400), 'th_view_02.png', (400, 376)
-        # file1, pos1, file2, pos2 = 'th_view_02.png', (400, 376), 'th_view_03.png', (331, 139)
-        # file1, pos1, file2, pos2 = 'small_head.png', (736, 40), 'th_view_04.png', (700, 9)
-        # file1, pos1, file2, pos2 = 'th_view_04.png', (700, 9), 'th_view_05.png', (326, 14)
-        # file1, pos1, file2, pos2 = 'th_view_07.png', (326, 14), 'walking_man_01.png', (341, 6)
-        # file1, pos1, file2, pos2 = 'th_view_04.png', (700, 9), 'waiting_woman.png', (689, 14)
-        # file1, pos1, file2, pos2 = 'waiting_woman.png', (689, 14), 'th_view_08.png', (477, 14)
-        # file1, pos1, file2, pos2 = 'th_view_08.png', (477, 14), 'walking_man_02.png', (479, 1)
-        file1, pos1, file2, pos2 = 'th_view_08.png', (477, 14), 'th_view_10.png', (499, 10)
-        check_position(file1, pos1, file2, pos2)
-        
-        
-        
         # ************** make morphologial operations **************
         # images need to be thicker, but for now we can leave it as it is
-    
-    
-    
-    
+        
+        
 '''
 info:
     -humans originally are orange
@@ -712,7 +708,14 @@ info:
     -think of some sounds while drawing
     -every added image should exist as subimage, which let us to move it
     -for lazy people make sequence, which executes every time enter is typing into input
+    -
+    
+todo:
     -add color specifying
+    -add "sound on/off"
+    -clean functions
+    -make tv background
+    -think of make a pypi package from it
     -
     
 bugs:
