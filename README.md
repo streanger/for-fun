@@ -7,3 +7,12 @@
   - mechanic write in console (with timeout)
   - copy & paste log
   - tkinter app example
+  - drawing over screen
+  - draw planets
+  - hacker test
+  - happy couple animation
+  
+  
+## screen from happy_couple animation
+
+![image](happy_couple/happy_couple.png)
