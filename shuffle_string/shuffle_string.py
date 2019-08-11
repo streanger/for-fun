@@ -40,13 +40,17 @@ def shuffle_string(s, reverse = False):
     
 def shuffle_word(s, reverse):
     '''shuffle word if item s.strip() is more than three characters'''
-    if (len(s.strip()) > 3):
-        center = list(s[1:-1])
+    sPart = s.strip().strip(('.,"! '))      # add other characters; think of reverse logic, to alpha chars
+    if len(sPart) > 3:
+        sIndex = s.index(sPart)
+        sPartLen = len(sPart)
+        center = list(sPart[1:-1])
         if reverse:
             center = center[::-1]
         else:
             shuffle(center)
-        out = s[0] + ''.join(center) + s[-1]
+        sPartShuffled = sPart[0] + ''.join(center) + sPart[-1]
+        out = s[:sIndex] + sPartShuffled + s[sIndex+sPartLen:]
     else:
         out = s
     return out
