@@ -40,7 +40,8 @@ def shuffle_string(s, reverse = False):
     
 def shuffle_word(s, reverse):
     '''shuffle word if item s.strip() is more than three characters'''
-    sPart = s.strip().strip(('.,"! '))      # add other characters; think of reverse logic, to alpha chars
+    sPart = s.strip(('.,"! '))      # add other characters; think of reverse logic, to alpha chars
+    #sPart = s.strip()               # this is for spaces only
     if len(sPart) > 3:
         sIndex = s.index(sPart)
         sPartLen = len(sPart)
