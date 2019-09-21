@@ -1,3 +1,6 @@
+'''
+https://www.whoismrrobot.com/endgame/
+'''
 import sys
 import os
 import time
@@ -97,31 +100,31 @@ def check_rays(img, pos):
     return out
     
     
-def make_path(img, pos, last=''):
+def make_path(img, pos, margin, last=''):
     '''
         img - image with maze(tunnel)
         pos - initial position (X, Y)
         last - last way (up/down/left/right)
+        margin - distance from the wall(it may be calculated from tubbel thickness?)
     '''
-    decreaseValue = 16                                   # it may be calculated from tubbel thickness?
     shape = img.shape                                   # (Y, X)
     boundaries = (0, shape[0]-1, shape[1]-1)
     # print('initial pos[X, Y]: {}'.format(pos))
     POSITIONS = [pos]
     
-    for x in range(26):
+    for x in range(200):
         out = check_rays(img, pos)
         new = choose_way(out, last)
-        new = (new[0], new[1] - decreaseValue)
+        new = (new[0], new[1] - margin)
         
-        if not new[1]:
+        ways = list(zip(*out))[1]
+        if (x > 2) and (not all(ways)):
+            # print('we come to an end')
             new = way_out(out, last, shape, pos)        # we come to an end
             
         pos = update_pos(pos, new)
         POSITIONS.append(pos)
         last = new[0]
-        # print('new pos: {}, direction(last): {}'.format(pos, last))
-        # print('new pos: {}'.format(pos))
         
         if pos[0] in boundaries or (pos[1] in boundaries):
             # print('you are out :)\nx: {}'.format(x))
@@ -134,7 +137,7 @@ def draw_path(img, positions):
     out = img.copy()
     for key, pos in enumerate(positions):
         if key:
-            out = cv2.line(out, positions[key-1], pos, (105, 255, 105), 3)
+            out = cv2.line(out, positions[key-1], pos, (105, 255, 105), 2)
         cv2.imshow('out', out)
         time.sleep(0.025)
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -146,39 +149,68 @@ def draw_path(img, positions):
     
 def mouse_movement(positions):
     '''make mouse movement with initial position'''
+    input('press enter to read current position mouse position\n')
+    startX, startY = pyautogui.position()
+    firstX, firstY = positions[0]
+    correctX = firstX - startX
+    correctY = firstY - startY
+    print('startX: {}, startY: {}'.format(startX, startY))
+    # print('firstX: {}, firstY: {}'.format(firstX, firstY))
+    # print('correctX: {}, correctY: {}'.format(correctX, correctY))
+    
+    # pyautogui.moveTo(firstX - correctX, firstY - correctY)
+    pyautogui.moveTo(startX, startY)
+    for posX, posY in positions:
+        X = posX - correctX
+        Y = posY - correctY
+        pyautogui.dragTo(X, Y, button='left')
+        time.sleep(0.0025)
     return True
+    
+    
+def cat_images(images, axis=1):
+    out = np.concatenate(images, axis=axis)
+    return out
     
     
 if __name__ == "__main__":
     script_path()
     
+    # *********** choose maze, define start and margin ***********
+    file, pos, margin, bitReversed = 'maze_00.png', (49, 47), 16, False
+    file, pos, margin, bitReversed = 'maze_01.png', (33, 265), 16, False
+    # file, pos, margin, bitReversed = 'maze_02.png', (47, 216), 16, False
+    # file, pos, margin, bitReversed = 'maze_03.png', (57, 110), 8, False     # MY OWN
+    
     
     # *********** calculate positions ***********
-    img = cv2.imread('clear.png', 0)
-    POSITIONS = make_path(img, (47, 216), '')
+    img = cv2.imread(file, 0)
+    if bitReversed:
+        img = cv2.bitwise_not(img)
+    POSITIONS = make_path(img, pos, margin, '')
     
     
     # *********** draw path on image ***********
-    img = cv2.imread('clear.png', 1)        # color mode
-    out = draw_path(img, POSITIONS)
-    cv2.imwrite('solution.png', out)
+    if True:
+        img = cv2.imread(file, 1)        # color mode
+        out = draw_path(img, POSITIONS)
+        cv2.imwrite('{}_solution.png'.format(file.split('.')[0]), out)
     
     
     # *********** make mouse movements ***********
-    mouse_movement(positions)
-    
+    # mouse_movement(POSITIONS)
     
     
 '''
-before:
-    -we got 4 ways, and can't go back
-    -can't do last 2 ways
-    -5px before white
-    -choose one of two longest way and never look back
-    
 todo:
-    -draw path on the image
-    -move mouse live
+    -calc positions(+)
+    -draw path on the image(+)
+    -calc correctX, correctY(+)
+    -move mouse live(+)
+    
+useful:
+    https://pyautogui.readthedocs.io/en/latest/mouse.html
+    # pyautogui.click(button='left')
+    # pyautogui.moveTo(startX + posX, startY+posY)
     
 '''
-
