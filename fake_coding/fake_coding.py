@@ -3,6 +3,7 @@ import os
 import time
 import ctypes
 import win32api
+import win32con
 import pyautogui
 
 # REMEMBER! typing virtual keys may be blockey by some antiviruses
@@ -158,7 +159,9 @@ def press_key(key):
            'play_key':0xFA,
            'zoom_key':0xFB,
            'clear_key':0xFE,
-           '+':0xBB,
+           
+           # '+':0xBB,    # is it ok?
+           '=':0xBB,    # or this one?
            ',':0xBC,
            '-':0xBD,
            '.':0xBE,
@@ -178,15 +181,72 @@ def press_key(key):
     win32api.keybd_event(val, 0, 0, 0)
     return True
     
+def map_keys(key):
+    data = {
+        '~': '`',
+        '!': '1',
+        '@': '2',
+        '#': '3',
+        '$': '4',
+        '%': '5',
+        '^': '6',
+        '&': '7',
+        '*': '8',
+        '(': '9',
+        ')': '0',
+        '_': '-',
+        '+': '=',   # if problems swap key and value
+        ':': ';',
+        '"': "'",
+        '{': '[',
+        '}': ']',
+        '?': '/',
+        '>': '.',
+        '<': ',',
+        }
+    if not key in data.keys():
+        return key
+    return data[key]
+    
     
 if __name__ == "__main__":
     script_path()
-    file = 'fake_coding.py'
-    # for now it need to be lowercase, becasue of lack virtual keys for upper letters(it require hotkey if i'm not wrong)
-    data = (character for character in read_file(file).lower())
+    # file = 'fake_coding.py'
+    file = 'image_histogram.py'
+    
+    sleep_between_keys = 0.050  # [ms]
+    spaces_in_line = [(line.find(line.lstrip()), line.lstrip()) if line.lstrip() else (len(line), line.lstrip()) for line in read_file(file).splitlines()]
+    calculated = [(0, line) if not key else ((value - spaces_in_line[key-1][0]), line) for key, (value, line) in enumerate(spaces_in_line)]
+    
+    
+    # ********** ONE LINE NOT COMPLETED IMPLEMENTATION **********
+    # out = '\n'.join([''.join((value * ' ', line)) if value >= 0 else ''.join((abs(value) * '\r', line)) for (value, line) in calculated])
+    # out = '\n'.join([''.join((value * ' ', line)) if value >= 0 else ''.join(('\n', abs(value) * '\r', line)) for (value, line) in calculated])
+    
+    
+    # ********** MULTI LINES COMPLETED IMPLEMENTATION **********
+    parts = []
+    for key, (value, line) in enumerate(calculated):
+        if value >=0:
+            part = ''.join((value * ' ', line))
+        else:
+            if not calculated[key-1][0]:
+                part = ''.join(('\n', abs(value) * '\r', line))
+            else:
+                part = ''.join((abs(value) * '\r', line))
+        parts.append(part)
+    out = '\n'.join(parts)
+    
+    
+    data = (character for character in out)
+    # -4 -4 time backspace
+    # +4 -4 time space
+    #  0 -stay in place   
+    
     hll_dll = ctypes.WinDLL("User32.dll")
     input('press enter, to start typing after 2[s] ')
     time.sleep(2)
+    
     while True:
         scroll_flag = hll_dll.GetKeyState(0x91)
         if scroll_flag == 1:
@@ -199,32 +259,37 @@ if __name__ == "__main__":
         # check if flag is set, e.g. check scroll lock key
         # read if any key was pressed
         # type some of the virtual keys from data
-        # pass
-        # print('typing keys')
-        # try:
-        if 1:
-            time.sleep(0.001)
-            c = next(data)
-            # c = c.lower()
-            if False:
-                print(c, end='')
-            else:
-                if c == '\n':
-                    c = 'enter'
-                if c == ' ':
-                    c = 'spacebar'
-                press_key(c)
-                
-                # PYAUTOGUI WAY; https://pypi.org/project/PyAutoGUI/
-                # pyautogui.press(c)
-                # print(c)
-                # pyautogui.typewrite(c)
-        # except:
-        else:
-            print('failed')
-            break
+        
+        time.sleep(sleep_between_keys)
+        c = next(data)
+        
+        if c == '\n':
+            c = 'enter'
             
+        if c == ' ':
+            c = 'spacebar'
             
+        if c == '\r':
+            c = 'backspace'
+            
+        status = press_key(c)
+        
+        if not status:
+            win32api.keybd_event(0xa0, 0, 0, 0)
+            base_c = c
+            c = c.lower()
+            c = map_keys(c)
+            status = press_key(c)
+            # print('status failed again, base_c: {}, mapped{}'.format(base_c, c))
+            win32api.keybd_event(0xa0, 0, win32con.KEYEVENTF_KEYUP, 0)
+            
+        # PYAUTOGUI WAY; https://pypi.org/project/PyAutoGUI/
+        # pyautogui.press(c)
+        # print(c)
+        # pyautogui.typewrite(c)
+        
+        
+        
 '''
 concepts:
     -get_state_vs_type_virtual_key, to write_code_in_npp
@@ -236,6 +301,10 @@ info:
     -won't block keyboard when pressing - typing both virtual and physicall keys, cause typing on the screen. We don't want it that way, no not today.
     -for now using ctypes. Think of clear code and use pyautogui as option
     -
+    
+14.01.2020:
+    -we need to remove all leading spaces
+    -23:24 - seems to work ok
     
 '''
 
