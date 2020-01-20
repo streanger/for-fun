@@ -209,39 +209,22 @@ def map_keys(key):
     return data[key]
     
     
-if __name__ == "__main__":
-    script_path()
-    # file = 'fake_coding.py'
-    file = 'image_histogram.py'
+def type_str_content(content, sleep_time=0.050):
+    '''
+        parameters:
+            content     -string content, to be typing
+            sleep_time  -time to wait between keys strokes in [ms]
+            
+        info about calculated stuff:
+            < 0     -n-th time backspace
+            > 0     -n-th time space
+             0      -stay in place
+    '''
     
-    sleep_between_keys = 0.050  # [ms]
-    spaces_in_line = [(line.find(line.lstrip()), line.lstrip()) if line.lstrip() else (len(line), line.lstrip()) for line in read_file(file).splitlines()]
+    spaces_in_line = [(line.find(line.lstrip()), line.lstrip()) if line.lstrip() else (len(line), line.lstrip()) for line in content.splitlines()]
     calculated = [(0, line) if not key else ((value - spaces_in_line[key-1][0]), line) for key, (value, line) in enumerate(spaces_in_line)]
-    
-    
-    # ********** ONE LINE NOT COMPLETED IMPLEMENTATION **********
-    # out = '\n'.join([''.join((value * ' ', line)) if value >= 0 else ''.join((abs(value) * '\r', line)) for (value, line) in calculated])
-    # out = '\n'.join([''.join((value * ' ', line)) if value >= 0 else ''.join(('\n', abs(value) * '\r', line)) for (value, line) in calculated])
-    
-    
-    # ********** MULTI LINES COMPLETED IMPLEMENTATION **********
-    parts = []
-    for key, (value, line) in enumerate(calculated):
-        if value >=0:
-            part = ''.join((value * ' ', line))
-        else:
-            if not calculated[key-1][0]:
-                part = ''.join(('\n', abs(value) * '\r', line))
-            else:
-                part = ''.join((abs(value) * '\r', line))
-        parts.append(part)
-    out = '\n'.join(parts)
-    
-    
+    out = '\n'.join([''.join((value * ' ', line)) if value >= 0 else ''.join((abs(value) * '\r', line)) for (value, line) in calculated])
     data = (character for character in out)
-    # -4 -4 time backspace
-    # +4 -4 time space
-    #  0 -stay in place   
     
     hll_dll = ctypes.WinDLL("User32.dll")
     input('press enter, to start typing after 2[s] ')
@@ -249,29 +232,20 @@ if __name__ == "__main__":
     
     while True:
         scroll_flag = hll_dll.GetKeyState(0x91)
-        if scroll_flag == 1:
-            # print('flag is set')
-            pass
-        else:
-            # print('flag is clear')
+        if not scroll_flag == 1:
             time.sleep(0.001)
             continue
         # check if flag is set, e.g. check scroll lock key
         # read if any key was pressed
         # type some of the virtual keys from data
         
-        time.sleep(sleep_between_keys)
+        time.sleep(sleep_time)
         c = next(data)
         
-        if c == '\n':
-            c = 'enter'
-            
-        if c == ' ':
-            c = 'spacebar'
-            
-        if c == '\r':
-            c = 'backspace'
-            
+        if c == '\n': c = 'enter'
+        if c == ' ': c = 'spacebar'
+        if c == '\r': c = 'backspace'
+        
         status = press_key(c)
         
         if not status:
@@ -280,16 +254,17 @@ if __name__ == "__main__":
             c = c.lower()
             c = map_keys(c)
             status = press_key(c)
-            # print('status failed again, base_c: {}, mapped{}'.format(base_c, c))
             win32api.keybd_event(0xa0, 0, win32con.KEYEVENTF_KEYUP, 0)
-            
-        # PYAUTOGUI WAY; https://pypi.org/project/PyAutoGUI/
-        # pyautogui.press(c)
-        # print(c)
-        # pyautogui.typewrite(c)
-        
-        
-        
+    return True
+    
+    
+if __name__ == "__main__":
+    script_path()
+    # file_content = read_file('image_histogram.py')
+    file_content = read_file('fake_coding.py')
+    type_str_content(file_content, 0.02)
+    
+    
 '''
 concepts:
     -get_state_vs_type_virtual_key, to write_code_in_npp
@@ -306,5 +281,7 @@ info:
     -we need to remove all leading spaces
     -23:24 - seems to work ok
     
+20.01.2020:
+    -it works in npp with disabled autocompletion
+    
 '''
-
