@@ -19,6 +19,8 @@ if __name__ == "__main__":
     
     # ****************** init pygame ******************
     pygame.init()
+    pygame.font.init()
+    myfont = pygame.font.SysFont('Comic Sans MS', 30)
     
     
     # ****************** screen setup ******************
@@ -35,7 +37,8 @@ if __name__ == "__main__":
     meat_color = (230, 50, 120)    
     meat_position_x = random.randrange(0, (width-meat_size), 20)
     meat_position_y = random.randrange(0, (height-meat_size), 20)
-    create_new_meat = True
+    meat_rect = pygame.Rect(meat_position_x, meat_position_y, meat_size, meat_size)
+    # create_new_meat = True
     
     
     # ****************** snake setup ******************
@@ -52,8 +55,8 @@ if __name__ == "__main__":
     
     # ****************** tail setup ******************
     last_positions = []
-    current_length = 1
-    current_length = 30
+    current_length = 2
+    # current_length = 30
     
     
     while 1:
@@ -106,12 +109,18 @@ if __name__ == "__main__":
         
         
         # ****************** draw meat ******************
-        if create_new_meat:
+        is_meat_eat = pygame.Rect.colliderect(snake, meat_rect)
+        # print('is_meat_eat: {}'.format(is_meat_eat))
+        
+        # if create_new_meat:
+        if is_meat_eat:
+            # print('munch. Snake grows')
+            current_length += 1
             meat_position_x = random.randrange(0, (width-meat_size), 20)
             meat_position_y = random.randrange(0, (height-meat_size), 20)
             meat_rect = pygame.Rect(meat_position_x, meat_position_y, meat_size, meat_size)
-            print('meat position: ({}, {})'.format(meat_position_x, meat_position_y))
-            create_new_meat = False
+            # print('new meat position: ({}, {})'.format(meat_position_x, meat_position_y))
+            is_meat_eat = False
             # if snake eat current meat, change flag, to True
         pygame.draw.rect(screen, meat_color, meat_rect)
         
@@ -121,6 +130,7 @@ if __name__ == "__main__":
         
         
         # ****************** draw tail ******************
+        tail_collisions = []
         for key, item in enumerate(last_positions[-current_length:]):
             # print('{:003}: {}'.format(key, item))
             
@@ -141,16 +151,37 @@ if __name__ == "__main__":
             tail_height = tail_bottom - tail_top
             tail_rect = pygame.Rect(tail_left, tail_top, tail_width, tail_height)
             pygame.draw.rect(screen, tail_color, tail_rect)
+            tail_collisions.append(pygame.Rect.colliderect(snake, tail_rect))
+            
+            
+        if sum(tail_collisions):
+            print('\n--------------------------')
+            print('SNAKE EAT YOURSELF :(')
+            print('GAME OVER!')
+            print('YOUR SCORE IS: {}'.format(current_length*10))
+            print('----------------------------\n')
+            
+            
+            # draw some text on the board
+            textsurface = myfont.render('GAME OVER!', False, (200, 20, 20))
+            screen.blit(textsurface, (200, 20))
+            
+            textsurface = myfont.render('YOUR SCORE IS: {}'.format(current_length*10), False, (200, 20, 20))
+            screen.blit(textsurface, (160, 80))
+            
+            pygame.display.flip()
+            # pygame.quit()
+            sys.exit()
             
             
         # ****************** update screen ******************
         pygame.display.flip()
-        time.sleep(0.1)
+        time.sleep(0.15)
         # color = ((ballrect.x)%256, (ballrect.y)%256, ((ballrect.x+ballrect.y)//2)%256)
         color = (50, 50, 150)
         last_positions.append((snake.left, snake.right, snake.top, snake.bottom))
         last_positions = last_positions[-current_length:]
-        # pygame.image.save(screen, "screenshot.jpg")
+        # pygame.image.save(screen, "screenshot.png")
         
         
 '''
@@ -169,6 +200,7 @@ todo:
     -add random meat, to eat
     -add collisions with tail
     -add meat eat
+    -one not working thing for now, is that we can turn back and then there is a collision
     -
     
 '''
