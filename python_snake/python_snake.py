@@ -38,7 +38,6 @@ if __name__ == "__main__":
     meat_position_x = random.randrange(0, (width-meat_size), 20)
     meat_position_y = random.randrange(0, (height-meat_size), 20)
     meat_rect = pygame.Rect(meat_position_x, meat_position_y, meat_size, meat_size)
-    # create_new_meat = True
     
     
     # ****************** snake setup ******************
@@ -56,12 +55,8 @@ if __name__ == "__main__":
     # ****************** tail setup ******************
     last_positions = []
     current_length = 2
-    # current_length = 30
-    
     
     while 1:
-        # print('speed_x: {:003}, speed_y: {:003}'.format(*speed), end='\r', flush=True)
-        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -109,19 +104,17 @@ if __name__ == "__main__":
         
         
         # ****************** draw meat ******************
-        is_meat_eat = pygame.Rect.colliderect(snake, meat_rect)
-        # print('is_meat_eat: {}'.format(is_meat_eat))
-        
-        # if create_new_meat:
-        if is_meat_eat:
-            # print('munch. Snake grows')
+        if pygame.Rect.colliderect(snake, meat_rect):
             current_length += 1
-            meat_position_x = random.randrange(0, (width-meat_size), 20)
-            meat_position_y = random.randrange(0, (height-meat_size), 20)
+            # put meat only in free places, not onto the snake tail
+            all_positions = set([(x, y) for x in range(0, (width-meat_size), 20) for y in range(0, (height-meat_size), 20)])
+            snake_head_position = (snake.left, snake.top)
+            snake_tail_positions = list(zip(*[item for key, item in enumerate(list(zip(*last_positions))) if not key%2]))
+            prohibited_positions = set(snake_tail_positions + [snake_head_position])     # snake tail + head
+            possible_positions = list(all_positions.difference(prohibited_positions))
+            meat_position_x, meat_position_y = random.choice(possible_positions)
             meat_rect = pygame.Rect(meat_position_x, meat_position_y, meat_size, meat_size)
-            # print('new meat position: ({}, {})'.format(meat_position_x, meat_position_y))
-            is_meat_eat = False
-            # if snake eat current meat, change flag, to True
+            
         pygame.draw.rect(screen, meat_color, meat_rect)
         
         
@@ -132,19 +125,10 @@ if __name__ == "__main__":
         # ****************** draw tail ******************
         tail_collisions = []
         for key, item in enumerate(last_positions[-current_length:]):
-            # print('{:003}: {}'.format(key, item))
-            
             if not key%2:
                 tail_color = (20, 100, 20)
             else:
                 tail_color = (30, 150, 30)
-                
-            # if not key%3:
-                # tail_color = (20, 100, 20)
-            # elif key%3 == 2:
-                # tail_color = (25, 125, 25)
-            # else:
-                # tail_color = (30, 150, 30)
                 
             tail_left, tail_right, tail_top, tail_bottom = item
             tail_width = tail_right - tail_left
@@ -161,7 +145,6 @@ if __name__ == "__main__":
             print('YOUR SCORE IS: {}'.format(current_length*10))
             print('----------------------------\n')
             
-            
             # draw some text on the board
             textsurface = myfont.render('GAME OVER!', False, (200, 20, 20))
             screen.blit(textsurface, (200, 20))
@@ -176,8 +159,7 @@ if __name__ == "__main__":
             
         # ****************** update screen ******************
         pygame.display.flip()
-        time.sleep(0.15)
-        # color = ((ballrect.x)%256, (ballrect.y)%256, ((ballrect.x+ballrect.y)//2)%256)
+        time.sleep(0.15)    # OK
         color = (50, 50, 150)
         last_positions.append((snake.left, snake.right, snake.top, snake.bottom))
         last_positions = last_positions[-current_length:]
@@ -186,21 +168,22 @@ if __name__ == "__main__":
         
 '''
 info:
-    -pygame
-    -tkinter
-    -cv2
-    -curses -> console
+    -pygame             (+)
+    -tkinter            (-)
+    -cv2                (-)
+    -curses -> console  (-)
     
 todo:
-    -create rect, which grows with new rects when catching other rects
-    -draw grid, to show possible move
-    -block reverse move
-    -add wall or not on the edges
-    -make snake possible to grow
-    -add random meat, to eat
-    -add collisions with tail
-    -add meat eat
-    -one not working thing for now, is that we can turn back and then there is a collision
+    -draw grid, to show possible move                       (-)                  
+    -block reverse move                                     (+)
+    -add wall or not on the edges                           (-)
+    -make snake possible to grow                            (+)                     
+    -add random meat, to eat                                (+)
+    -add collisions with tail                               (+)
+    -add meat eat                                           (+)
+    -remove turning back bug, which causing collision       (-)
+    -put meat only in free places, not onto the snake tail  (+)
+    -make snake thinner than one grid size                  (-)
     -
     
 '''
