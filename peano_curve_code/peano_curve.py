@@ -327,6 +327,6 @@ if __name__ == "__main__":
 todo:
     -draw over existing image with peano curve
     -extract values from image, by peano curve trace (clean)
-    -make the same, for hiber curve
+    -make the same, for hilbert curve
     
 '''
