@@ -1,21 +1,17 @@
-from tkinter import Tk, font
-from functools import partial
+import sys
+import os
+import ctypes
+import tkinter.font as TkFont
 from tkinter import *
 from tkinter import messagebox
-from PIL import ImageTk, Image
-import tkinter.font as TkFont
-import tkinter.ttk
-
 
 
 class Application_pack(Frame):
     '''
-    for now this works for fixed values of macs and names
-    
     unicode arrows:
         https://en.wikipedia.org/wiki/Arrows_(Unicode_block)
-        
     '''
+    
     def __init__(self, master):
         # *********** INIT, HIDE, CLOSING ***********
         # self.hide_console()
@@ -28,7 +24,6 @@ class Application_pack(Frame):
         self.RELIEF_TYPE = 'groove'
         self.ROW_RELIEF = 'raised'
         self.INFO_RELIEF = 'flat'
-        # self.MONO_FONT_NAME = TkFont.Font(family="Lucida console", size=50, weight="normal")
         self.MONO_FONT_NAME = TkFont.Font(family="Lucida console", size=40, weight="normal")
         self.MONO_FONT_INFO = TkFont.Font(family="Lucida console", size=9, weight="normal")
         self.MONO_BUTTON = TkFont.Font(family="Lucida console", size=30, weight="normal")
@@ -45,43 +40,87 @@ class Application_pack(Frame):
         
         # *********** ALL FONTS ***********
         self.ALL_FONTS = font.families()
+        self.FONTS_MONOSPACE_STATUS = self.check_if_mono(self.ALL_FONTS)
         self.NUMBER_OF_FONTS = len(self.ALL_FONTS)
         self.INDEX = 0
         
         
         # *********** CREATE WIDGETS ***********
+        self.DEFAULT_COLOR = self.master.cget('bg')
+        self.BG_COLOR_MONO = '#ADD8E6'
+        self.BG_COLOR_NORMAL = self.DEFAULT_COLOR
         self.create_widgets()
         
         
-    def on_closing(self):
-        '''
-        handle closing
-        https://stackoverflow.com/questions/111155/how-do-i-handle-the-window-close-event-in-tkinter
-        '''
+    def hide_console(self):
+        '''hide console window'''
+        if os.name == 'nt':
+            ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+        return None
         
+        
+    def check_if_mono(self, fonts):
+        '''generate dict of fonts monospace status'''
+        out = {}
+        
+        # phrase in font
+        mono_phrase = ('terminal', 'mono', 'consol', 'fixed')
+        
+        # must be equal
+        mono_equal = ('Courier', )
+        
+        for font in fonts:
+            font_type = False
+            for item in mono_phrase:
+                if item in font.lower():
+                    font_type = True
+                    break
+                    
+            if font in mono_equal:
+                font_type = True
+                
+            out[font] = font_type
+        return out
+        
+        
+    def on_closing(self):
+        '''handle closing; https://stackoverflow.com/questions/111155/how-do-i-handle-the-window-close-event-in-tkinter'''
         if messagebox.askokcancel('Quit', 'Do you want to quit?'):
-            # destroy main app
-            self.master.destroy()
-            
+            self.master.destroy()       # destroy main app
+            self.master.quit()
         return None
         
         
     def index_down(self):
-        self.INDEX += 1         # need to be swapped :)
-        if self.INDEX > max(self.NUMBER_OF_FONTS-1, 1):
-            self.INDEX = 0
-        # print(self.INDEX)
+        self.INDEX -= 1
+        if self.INDEX < 0:
+            self.INDEX = max(self.NUMBER_OF_FONTS-1, 1)
+            
         self.config_widgets()
         return None
         
         
     def index_up(self):
-        self.INDEX -= 1         # need to be swapped :)
-        if self.INDEX < 0:
-            self.INDEX = max(self.NUMBER_OF_FONTS-1, 1)
-        # print(self.INDEX)
+        self.INDEX += 1
+        if self.INDEX > max(self.NUMBER_OF_FONTS-1, 1):
+            self.INDEX = 0
+            
         self.config_widgets()
         return None
+        
+        
+    def bg_color(self, status):
+        '''get bg color depend on status'''
+        if status:
+            return self.BG_COLOR_MONO
+        return self.BG_COLOR_NORMAL
+        
+        
+    def mono_status_text(self, status):
+        '''get mono text depend on status'''
+        if status:
+            return ' MONO '
+        return 'NORMAL'
         
         
     def config_widgets(self):
@@ -92,15 +131,48 @@ class Application_pack(Frame):
         self.top_info_right_entry.insert(0, str(self.INDEX).center(center_val))
         
         
-        first_font = self.ALL_FONTS[(self.INDEX-2)%self.NUMBER_OF_FONTS]
-        second_font = self.ALL_FONTS[(self.INDEX-1)%self.NUMBER_OF_FONTS]
-        third_font = self.ALL_FONTS[(self.INDEX)%self.NUMBER_OF_FONTS]
-        fourth_font = self.ALL_FONTS[(self.INDEX+1)%self.NUMBER_OF_FONTS]
-        fifth_font = self.ALL_FONTS[(self.INDEX+2)%self.NUMBER_OF_FONTS]
+        first_index = (self.INDEX+2)%self.NUMBER_OF_FONTS
+        second_index = (self.INDEX+1)%self.NUMBER_OF_FONTS
+        third_index = (self.INDEX)%self.NUMBER_OF_FONTS
+        fourth_index = (self.INDEX-1)%self.NUMBER_OF_FONTS
+        fifth_index = (self.INDEX-2)%self.NUMBER_OF_FONTS
+        
+        
+        first_font = self.ALL_FONTS[first_index]
+        second_font = self.ALL_FONTS[second_index]
+        third_font = self.ALL_FONTS[third_index]
+        fourth_font = self.ALL_FONTS[fourth_index]
+        fifth_font = self.ALL_FONTS[fifth_index]
+        
+        
+        # ******** indexes labels ********
+        first_status = self.FONTS_MONOSPACE_STATUS[first_font]
+        first_index_text = '{}\n{}'.format(first_index, self.mono_status_text(first_status))
+        self.first_index.config(text=first_index_text, bg=self.bg_color(first_status))
+        
+        
+        second_status = self.FONTS_MONOSPACE_STATUS[second_font]
+        second_index_text = '{}\n{}'.format(second_index, self.mono_status_text(second_status))
+        self.second_index.config(text=second_index_text, bg=self.bg_color(second_status))
+        
+        
+        third_status = self.FONTS_MONOSPACE_STATUS[third_font]
+        third_index_text = '{}\n{}'.format(third_index, self.mono_status_text(third_status))
+        self.third_index.config(text=third_index_text, bg=self.bg_color(third_status))
+        
+        
+        fourth_status = self.FONTS_MONOSPACE_STATUS[fourth_font]
+        fourth_index_text = '{}\n{}'.format(fourth_index, self.mono_status_text(fourth_status))
+        self.fourth_index.config(text=fourth_index_text, bg=self.bg_color(fourth_status))
+        
+        
+        fifth_status = self.FONTS_MONOSPACE_STATUS[fifth_font]
+        fifth_index_text = '{}\n{}'.format(fifth_index, self.mono_status_text(fifth_status))
+        self.fifth_index.config(text=fifth_index_text, bg=self.bg_color(fifth_status))
+        
         
         
         # REMEBER TO DELETE ENTRIES
-        # self.first_text.config(text=first_font)
         self.first_text.delete(0, 'end')
         self.first_text.insert(0, first_font.center(center_val))
         
@@ -117,11 +189,15 @@ class Application_pack(Frame):
         self.fifth_text.insert(0, fifth_font.center(center_val))
         
         
-        
         center_text = third_font
         if len(center_text.split()) > 2:
             center_text = '\n'.join(center_text.split())
-            
+        elif len(center_text.split()) == 2 and len(center_text) > 12:
+            center_text = '\n'.join(center_text.split())
+        else:
+            if len(center_text) > 14:
+                center_text = '\n'.join(center_text.split('_'))
+                
         self.FONT = TkFont.Font(family=third_font, size=50, weight="normal")
         self.main_label.config(font=self.FONT, text=center_text)
         return None
@@ -149,7 +225,6 @@ class Application_pack(Frame):
         
     def key_event(self, event):
         '''key events callback'''
-        # print('event: {}'.format(event))
         code = event.keycode
         
         if code == 38:
@@ -187,12 +262,60 @@ class Application_pack(Frame):
         self.button_down.pack(expand=YES, fill=BOTH, side=BOTTOM)
         
         
+        
+        # ********* INDEXES & MONO INFO *********
+        self.left_indexes = Frame(self.main_frame)
+        self.left_indexes.pack(expand=NO, fill=BOTH, side=LEFT)
+        
+        
+        # SETUP
+        first_index = (self.INDEX+2)%self.NUMBER_OF_FONTS
+        second_index = (self.INDEX+1)%self.NUMBER_OF_FONTS
+        third_index = (self.INDEX)%self.NUMBER_OF_FONTS
+        fourth_index = (self.INDEX-1)%self.NUMBER_OF_FONTS
+        fifth_index = (self.INDEX-2)%self.NUMBER_OF_FONTS
+        
+        
+        first_font = self.ALL_FONTS[first_index]
+        second_font = self.ALL_FONTS[second_index]
+        third_font = self.ALL_FONTS[third_index]
+        fourth_font = self.ALL_FONTS[fourth_index]
+        fifth_font = self.ALL_FONTS[fifth_index]
+        
+        
+        first_status = self.FONTS_MONOSPACE_STATUS[first_font]
+        second_status = self.FONTS_MONOSPACE_STATUS[second_font]
+        third_status = self.FONTS_MONOSPACE_STATUS[third_font]
+        fourth_status = self.FONTS_MONOSPACE_STATUS[fourth_font]
+        fifth_status = self.FONTS_MONOSPACE_STATUS[fifth_font]
+        
+        
+        first_index_text = '{}\n{}'.format(first_index, self.mono_status_text(first_status))
+        second_index_text = '{}\n{}'.format(second_index, self.mono_status_text(second_status))
+        third_index_text = '{}\n{}'.format(third_index, self.mono_status_text(third_status))
+        fourth_index_text = '{}\n{}'.format(fourth_index, self.mono_status_text(fourth_status))
+        fifth_index_text = '{}\n{}'.format(fifth_index, self.mono_status_text(fifth_status))
+        
+        
+        # TEXT DATA NEED TO BE SET AUTOMATICALLY HERE
+        self.first_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, text=first_index_text, bg=self.bg_color(first_status))
+        self.first_index.pack(expand=YES, fill=BOTH, side=TOP)
+        self.second_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, text=second_index_text, bg=self.bg_color(second_status))
+        self.second_index.pack(expand=YES, fill=BOTH, side=TOP)
+        self.third_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, text=third_index_text, bg=self.bg_color(third_status))
+        self.third_index.pack(expand=YES, fill=BOTH, side=TOP)
+        self.fourth_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, text=fourth_index_text, bg=self.bg_color(fourth_status))
+        self.fourth_index.pack(expand=YES, fill=BOTH, side=TOP)
+        self.fifth_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, text=fifth_index_text, bg=self.bg_color(fifth_status))
+        self.fifth_index.pack(expand=YES, fill=BOTH, side=TOP)
+        
+        
+        
         # ********* LEFT FRAME *********
         self.left_frame = Frame(self.main_frame)
-        self.left_frame.pack(expand=NO, fill=BOTH, side=LEFT)
+        self.left_frame.pack(expand=NO, fill=BOTH, side=LEFT)        
         
-        
-        
+        # ********* ENTRIES *********
         center_val = 20
         self.first_sv = StringVar()
         self.first_text = Entry(self.left_frame, font=self.MONO_FONT_INFO, textvariable=self.first_sv)
@@ -257,11 +380,6 @@ class Application_pack(Frame):
         return True
         
         
-        
-        
 if __name__ == "__main__":
-    # script_path()
-    app = Application_pack(master=Tk())             #app example with using pack
+    app = Application_pack(master=Tk())
     app.mainloop()
-    
-    
