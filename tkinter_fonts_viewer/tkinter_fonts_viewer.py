@@ -1,15 +1,77 @@
 import sys
 import os
+import time
 import ctypes
 import tkinter.font as TkFont
 from tkinter import *
 from tkinter import messagebox
+from threading import Thread
 
 
-class Application_pack(Frame):
+
+class FontsMonoCheck(Frame):
+    '''class for testing fonts mono status
+    https://stackoverflow.com/questions/4481880/minimizing-a-tk-window
     '''
-    unicode arrows:
+    def __init__(self, master):
+        super().__init__(master)
+        self.master.geometry('30x30')
+        self.master.iconify()      # minimized window
+        
+        self.test_label = Label(self.master)
+        self.test_label.pack(expand=NO, fill=Y, side=BOTTOM)
+        
+        fonts = font.families()
+        self.fonts_mono_status = {}
+        self.test_thread = Thread(target=self.check_fonts_thread, args=(fonts,))
+        self.test_thread.start()
+        
+        
+    def cleanup(self):
+        '''join thread and destroy window'''
+        self.test_thread.join()
+        self.master.destroy()
+        
+        
+    def check_fonts_thread(self, fonts):
+        '''check fonts in thread'''
+        default_color = self.master.cget('bg')
+        for key, font in enumerate(fonts):
+            # set proper font
+            self.test_font = TkFont.Font(family=font, size=11)
+            self.test_label.config(font=self.test_font, fg=default_color)  #invisible color
+            
+            # set '.' as text
+            self.test_label.config(text=".")
+            self.master.update()        # this is needed for true width value
+            dot_width = self.test_label.winfo_width()
+            
+            # set 'm' as text
+            self.test_label.config(text='m')
+            self.master.update()        # this is needed for true width value
+            m_width = self.test_label.winfo_width()
+            
+            # show & compare sizes
+            status = bool(m_width == dot_width)
+            # out[font] = status
+            self.fonts_mono_status[font] = status
+            
+        self.test_label.pack_forget()
+        self.master.update()
+        
+        self.master.quit()
+        self.master.update()
+        return None
+        
+        
+        
+class TkinterFontsViewer(Frame):
+    '''
+    info:
         https://en.wikipedia.org/wiki/Arrows_(Unicode_block)
+        https://stackoverflow.com/questions/6893968/how-to-get-the-return-value-from-a-thread-in-python
+        https://stackoverflow.com/questions/16115378/tkinter-example-code-for-multiple-windows-why-wont-buttons-load-correctly
+        https://stackoverflow.com/questions/1892339/how-to-make-a-tkinter-window-jump-to-the-front
     '''
     
     def __init__(self, master):
@@ -17,28 +79,22 @@ class Application_pack(Frame):
         # self.hide_console()
         super().__init__(master)
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.master.geometry('{}x{}+333+50'.format(800, 500))
+        self.master.resizable(width=True, height=True)
+        self.master.wm_title("gui_app")
+        self.pack()
         
         
         # *********** APP GUI, CONST, VARIABLES ***********
         # raised, sunken, flat, ridge, solid, groove     
         self.RELIEF_TYPE = 'groove'
-        self.ROW_RELIEF = 'raised'
-        self.INFO_RELIEF = 'flat'
         self.MONO_FONT_NAME = TkFont.Font(family="Lucida console", size=40, weight="normal")
-        self.MONO_FONT_INFO = TkFont.Font(family="Lucida console", size=9, weight="normal")
-        self.MONO_BUTTON = TkFont.Font(family="Lucida console", size=30, weight="normal")
+        self.MONO_FONT_INFO = TkFont.Font(family="Lucida console", size=10, weight="normal")
+        self.MONO_BUTTON = TkFont.Font(family="Lucida console", size=25, weight="normal")
         self.MONO_FONT_INFO_UPPER = TkFont.Font(family="Lucida console", size=12, weight="normal")
-        self.CENTER_CHAR = ' '      # 'x'
-        
-        self.padx = 0
-        self.pady = 1
-        self.master.geometry('{}x{}+333+50'.format(800, 500))
-        self.master.resizable(width=False, height=True)
-        self.master.wm_title("gui_app")
-        self.pack()
         
         
-        # *********** ALL FONTS ***********
+        # *********** FONTS MONO STATUS ***********
         self.ALL_FONTS = font.families()
         self.FONTS_MONOSPACE_STATUS = self.check_if_mono(self.ALL_FONTS)
         self.NUMBER_OF_FONTS = len(self.ALL_FONTS)
@@ -46,10 +102,16 @@ class Application_pack(Frame):
         
         
         # *********** CREATE WIDGETS ***********
-        self.DEFAULT_COLOR = self.master.cget('bg')
+        self.default_color = self.master.cget('bg')
         self.BG_COLOR_MONO = '#ADD8E6'
-        self.BG_COLOR_NORMAL = self.DEFAULT_COLOR
+        self.BG_COLOR_NORMAL = self.default_color
         self.create_widgets()
+        
+        
+        # *********** LIFT, GET FOCUS ***********
+        self.master.lift()                          # move window to the top
+        self.master.focus_force()
+        # self.master.attributes("-topmost", True)    # always on top
         
         
     def hide_console(self):
@@ -60,27 +122,14 @@ class Application_pack(Frame):
         
         
     def check_if_mono(self, fonts):
-        '''generate dict of fonts monospace status'''
-        out = {}
-        
-        # phrase in font
-        mono_phrase = ('terminal', 'mono', 'consol', 'fixed')
-        
-        # must be equal
-        mono_equal = ('Courier', )
-        
-        for font in fonts:
-            font_type = False
-            for item in mono_phrase:
-                if item in font.lower():
-                    font_type = True
-                    break
-                    
-            if font in mono_equal:
-                font_type = True
-                
-            out[font] = font_type
-        return out
+        '''check fonts mono status with new window
+        https://stackoverflow.com/questions/16115378/tkinter-example-code-for-multiple-windows-why-wont-buttons-load-correctly
+        '''
+        self.newWindow = Toplevel(self.master)
+        test_app = FontsMonoCheck(self.newWindow)
+        test_app.mainloop()
+        test_app.cleanup()
+        return test_app.fonts_mono_status
         
         
     def on_closing(self):
@@ -242,10 +291,8 @@ class Application_pack(Frame):
         # ********* bind key event for master widget *********
         self.master.bind('<Key>', self.key_event)
         
-        
         self.top_label = Label(self.master, font=self.MONO_FONT_INFO_UPPER, text="TKINTER FONTS VIEWER")
         self.top_label.pack(expand=NO, fill=X, side=TOP)
-        
         
         self.main_frame = Frame(self.master)
         self.main_frame.pack(expand=YES, fill=BOTH, side=BOTTOM)
@@ -298,15 +345,15 @@ class Application_pack(Frame):
         
         
         # TEXT DATA NEED TO BE SET AUTOMATICALLY HERE
-        self.first_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, text=first_index_text, bg=self.bg_color(first_status))
+        self.first_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO, text=first_index_text, bg=self.bg_color(first_status))
         self.first_index.pack(expand=YES, fill=BOTH, side=TOP)
-        self.second_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, text=second_index_text, bg=self.bg_color(second_status))
+        self.second_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO, text=second_index_text, bg=self.bg_color(second_status))
         self.second_index.pack(expand=YES, fill=BOTH, side=TOP)
-        self.third_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, text=third_index_text, bg=self.bg_color(third_status))
+        self.third_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO, text=third_index_text, bg=self.bg_color(third_status))
         self.third_index.pack(expand=YES, fill=BOTH, side=TOP)
-        self.fourth_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, text=fourth_index_text, bg=self.bg_color(fourth_status))
+        self.fourth_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO, text=fourth_index_text, bg=self.bg_color(fourth_status))
         self.fourth_index.pack(expand=YES, fill=BOTH, side=TOP)
-        self.fifth_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, text=fifth_index_text, bg=self.bg_color(fifth_status))
+        self.fifth_index = Label(self.left_indexes, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO, text=fifth_index_text, bg=self.bg_color(fifth_status))
         self.fifth_index.pack(expand=YES, fill=BOTH, side=TOP)
         
         
@@ -347,11 +394,9 @@ class Application_pack(Frame):
         self.fifth_text.pack(expand=YES, fill=BOTH, side=TOP)
         
         
-        
         # ********* RIGHT FRAME *********
         self.right_frame = Frame(self.main_frame)
         self.right_frame.pack(expand=YES, fill=BOTH, side=RIGHT)
-        
         
         
         # righ top info
@@ -372,14 +417,13 @@ class Application_pack(Frame):
         self.top_info_right_entry.pack(expand=NO, fill=Y, side=RIGHT)
         
         
-        
         self.main_label = Label(self.right_frame, relief=self.RELIEF_TYPE, font=self.MONO_FONT_NAME, text="MAIN LABEL")
         self.main_label.pack(expand=YES, fill=BOTH, side=BOTTOM)
-        
         
         return True
         
         
+        
 if __name__ == "__main__":
-    app = Application_pack(master=Tk())
+    app = TkinterFontsViewer(master=Tk())
     app.mainloop()
