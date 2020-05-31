@@ -36,6 +36,7 @@ class FontsMonoCheck(Frame):
     def check_fonts_thread(self, fonts):
         '''check fonts in thread'''
         default_color = self.master.cget('bg')
+        
         for key, font in enumerate(fonts):
             # set proper font
             self.test_font = TkFont.Font(family=font, size=11)
@@ -92,13 +93,35 @@ class TkinterFontsViewer(Frame):
         self.MONO_FONT_INFO = TkFont.Font(family="Lucida console", size=10, weight="normal")
         self.MONO_BUTTON = TkFont.Font(family="Lucida console", size=25, weight="normal")
         self.MONO_FONT_INFO_UPPER = TkFont.Font(family="Lucida console", size=12, weight="normal")
+        # self.MONO_FONT_BUTTON_MODE = TkFont.Font(family="Lucida console", size=8, weight="normal")
         
         
         # *********** FONTS MONO STATUS ***********
+        self.FONTS_MODE = 0
+        self.FONTS_MODES_DICT = {
+            0: 'all',
+            1: 'normal',
+            2: 'mono',
+            }
+            
         self.ALL_FONTS = font.families()
+        self.ALL_FONTS = sorted(list(set(self.ALL_FONTS)))      # remove duplicates
         self.FONTS_MONOSPACE_STATUS = self.check_if_mono(self.ALL_FONTS)
-        self.NUMBER_OF_FONTS = len(self.ALL_FONTS)
         self.INDEX = 0
+        
+        self.MONO_FONTS = []
+        self.NORMAL_FONTS = []
+        
+        for key, value in self.FONTS_MONOSPACE_STATUS.items():
+            if value:
+                self.MONO_FONTS.append(key)
+            else:
+                self.NORMAL_FONTS.append(key)
+                
+        self.FONTS_TO_SHOW = self.ALL_FONTS     # current fonts to show
+        self.FILTER = ''
+        self.FONTS_FILTERED = self.filter_fonts(self.FONTS_TO_SHOW, self.FILTER) # at start show all fonts
+        self.NUMBER_OF_FONTS = len(self.FONTS_FILTERED)
         
         
         # *********** CREATE WIDGETS ***********
@@ -142,18 +165,14 @@ class TkinterFontsViewer(Frame):
         
     def index_down(self):
         self.INDEX -= 1
-        if self.INDEX < 0:
-            self.INDEX = max(self.NUMBER_OF_FONTS-1, 1)
-            
+        self.INDEX = self.INDEX % self.NUMBER_OF_FONTS
         self.config_widgets()
         return None
         
         
     def index_up(self):
         self.INDEX += 1
-        if self.INDEX > max(self.NUMBER_OF_FONTS-1, 1):
-            self.INDEX = 0
-            
+        self.INDEX = self.INDEX % self.NUMBER_OF_FONTS
         self.config_widgets()
         return None
         
@@ -172,12 +191,25 @@ class TkinterFontsViewer(Frame):
         return 'NORMAL'
         
         
+    def perform_center_text(self, text):
+        '''perform text(font name), to fit main label'''
+        if len(text.split()) > 2:
+            text = '\n'.join(text.split())
+        elif len(text.split()) == 2 and len(text) > 12:
+            text = '\n'.join(text.split())
+        else:
+            if len(text) > 14:
+                text = '\n'.join(text.split('_'))
+        return text
+        
+        
     def config_widgets(self):
         center_val = 20
+        top_center_val = 15
         
         # ******** current index entry ********
-        self.top_info_right_entry.delete(0, 'end')
-        self.top_info_right_entry.insert(0, str(self.INDEX).center(center_val))
+        self.current_index_entry.delete(0, 'end')
+        self.current_index_entry.insert(0, str(self.INDEX).center(top_center_val))
         
         
         first_index = (self.INDEX+2)%self.NUMBER_OF_FONTS
@@ -187,11 +219,11 @@ class TkinterFontsViewer(Frame):
         fifth_index = (self.INDEX-2)%self.NUMBER_OF_FONTS
         
         
-        first_font = self.ALL_FONTS[first_index]
-        second_font = self.ALL_FONTS[second_index]
-        third_font = self.ALL_FONTS[third_index]
-        fourth_font = self.ALL_FONTS[fourth_index]
-        fifth_font = self.ALL_FONTS[fifth_index]
+        first_font = self.FONTS_FILTERED[first_index]
+        second_font = self.FONTS_FILTERED[second_index]
+        third_font = self.FONTS_FILTERED[third_index]
+        fourth_font = self.FONTS_FILTERED[fourth_index]
+        fifth_font = self.FONTS_FILTERED[fifth_index]
         
         
         # ******** indexes labels ********
@@ -238,15 +270,7 @@ class TkinterFontsViewer(Frame):
         self.fifth_text.insert(0, fifth_font.center(center_val))
         
         
-        center_text = third_font
-        if len(center_text.split()) > 2:
-            center_text = '\n'.join(center_text.split())
-        elif len(center_text.split()) == 2 and len(center_text) > 12:
-            center_text = '\n'.join(center_text.split())
-        else:
-            if len(center_text) > 14:
-                center_text = '\n'.join(center_text.split('_'))
-                
+        center_text = self.perform_center_text(third_font)
         self.FONT = TkFont.Font(family=third_font, size=50, weight="normal")
         self.main_label.config(font=self.FONT, text=center_text)
         return None
@@ -256,18 +280,94 @@ class TkinterFontsViewer(Frame):
         '''entries callback'''
         
         # ******** perform value ********
-        value = self.top_info_right_entry.get()
+        value = self.current_index_entry.get()
         try:
             self.INDEX = (int(value.strip()))%self.NUMBER_OF_FONTS
         except ValueError:
             pass
             
         # ******** update entry ********
-        self.top_info_right_entry.delete(0, 'end')
-        self.top_info_right_entry.insert(0, str(self.INDEX).center(20))
+        self.current_index_entry.delete(0, 'end')
+        self.current_index_entry.insert(0, str(self.INDEX).center(15))
         
         
         # ******** update widgets ********
+        self.config_widgets()
+        return None
+        
+        
+    def filter_callback(self, event):
+        '''filter callback'''
+        
+        # ******** perform value ********
+        value = self.filter_entry.get()
+        self.FILTER = str(value.strip().lower())
+        new_entry_text = self.FILTER
+        # print('self.FILTER: {}'.format(self.FILTER))
+        
+        
+        # ******** update filtered list ********
+        self.FONTS_FILTERED = self.filter_fonts(self.FONTS_TO_SHOW, self.FILTER)
+        self.NUMBER_OF_FONTS = len(self.FONTS_FILTERED)
+        # print('self.NUMBER_OF_FONTS: {}'.format(self.NUMBER_OF_FONTS))
+        
+        if not self.NUMBER_OF_FONTS:
+            self.FONTS_FILTERED = self.FONTS_TO_SHOW
+            self.NUMBER_OF_FONTS = len(self.FONTS_FILTERED)
+            self.FILTER = ''
+            new_entry_text = '<not found>'
+            
+        # ******** update entry ********
+        self.filter_entry.delete(0, 'end')
+        self.filter_entry.insert(0, new_entry_text.center(15))
+        
+        
+        # ******** update widgets ********
+        # update total fonts label
+        self.top_info_left_down.config(text=self.NUMBER_OF_FONTS)
+        self.INDEX = 0
+        
+        # update rest of widgets
+        self.INDEX = 0
+        self.config_widgets()
+        return None
+        
+        
+    def filter_fonts(self, fonts, filter):
+        '''filter list of fonts'''
+        return [font for font in fonts if filter.lower() in font.lower()]
+        
+        
+    def switch_font_mode(self):
+        '''switch sound mode'''
+        self.FONTS_MODE = (self.FONTS_MODE + 1)%3
+        
+        if self.FONTS_MODE == 0:
+            self.FONTS_TO_SHOW = self.ALL_FONTS
+        elif self.FONTS_MODE == 1:
+            self.FONTS_TO_SHOW = self.NORMAL_FONTS
+        elif self.FONTS_MODE == 2:
+            self.FONTS_TO_SHOW = self.MONO_FONTS
+            
+        # ******** update filtered list ********
+        self.FONTS_FILTERED = self.filter_fonts(self.FONTS_TO_SHOW, self.FILTER)
+        self.NUMBER_OF_FONTS = len(self.FONTS_FILTERED)
+        
+        if not self.NUMBER_OF_FONTS:
+            self.FONTS_FILTERED = self.FONTS_TO_SHOW
+            self.NUMBER_OF_FONTS = len(self.FONTS_FILTERED)
+            
+        # ******** update widgets ********
+        # update total fonts label
+        self.top_info_left_down.config(text=self.NUMBER_OF_FONTS)
+        self.INDEX = 0
+        
+        # update mode label
+        button_text = '{}\n{}'.format(' MODE ', self.FONTS_MODES_DICT[self.FONTS_MODE].upper())
+        self.mode_button.config(text=button_text)
+        
+        # update rest of widgets
+        self.INDEX = 0
         self.config_widgets()
         return None
         
@@ -323,11 +423,11 @@ class TkinterFontsViewer(Frame):
         fifth_index = (self.INDEX-2)%self.NUMBER_OF_FONTS
         
         
-        first_font = self.ALL_FONTS[first_index]
-        second_font = self.ALL_FONTS[second_index]
-        third_font = self.ALL_FONTS[third_index]
-        fourth_font = self.ALL_FONTS[fourth_index]
-        fifth_font = self.ALL_FONTS[fifth_index]
+        first_font = self.FONTS_FILTERED[first_index]
+        second_font = self.FONTS_FILTERED[second_index]
+        third_font = self.FONTS_FILTERED[third_index]
+        fourth_font = self.FONTS_FILTERED[fourth_index]
+        fifth_font = self.FONTS_FILTERED[fifth_index]
         
         
         first_status = self.FONTS_MONOSPACE_STATUS[first_font]
@@ -362,35 +462,36 @@ class TkinterFontsViewer(Frame):
         self.left_frame = Frame(self.main_frame)
         self.left_frame.pack(expand=NO, fill=BOTH, side=LEFT)        
         
+        
         # ********* ENTRIES *********
         center_val = 20
         self.first_sv = StringVar()
         self.first_text = Entry(self.left_frame, font=self.MONO_FONT_INFO, textvariable=self.first_sv)
-        self.first_text.insert(0, self.ALL_FONTS[self.INDEX-2].center(center_val))
+        self.first_text.insert(0, self.FONTS_FILTERED[first_index].center(center_val))
         self.first_text.pack(expand=YES, fill=BOTH, side=TOP)
         
         
         self.second_sv = StringVar()
         self.second_text = Entry(self.left_frame, font=self.MONO_FONT_INFO, textvariable=self.second_sv)
-        self.second_text.insert(0, self.ALL_FONTS[self.INDEX-1].center(center_val))
+        self.second_text.insert(0, self.FONTS_FILTERED[second_index].center(center_val))
         self.second_text.pack(expand=YES, fill=BOTH, side=TOP)
         
         
         self.third_sv = StringVar()
         self.third_text = Entry(self.left_frame, font=self.MONO_FONT_INFO, textvariable=self.third_sv)
-        self.third_text.insert(0, self.ALL_FONTS[self.INDEX].center(center_val))
+        self.third_text.insert(0, self.FONTS_FILTERED[third_index].center(center_val))
         self.third_text.pack(expand=YES, fill=BOTH, side=TOP)
         
         
         self.fourth_sv = StringVar()
         self.fourth_text = Entry(self.left_frame, font=self.MONO_FONT_INFO, textvariable=self.fourth_sv)
-        self.fourth_text.insert(0, self.ALL_FONTS[self.INDEX+1].center(center_val))
+        self.fourth_text.insert(0, self.FONTS_FILTERED[fourth_index].center(center_val))
         self.fourth_text.pack(expand=YES, fill=BOTH, side=TOP)
         
         
         self.fifth_sv = StringVar()
         self.fifth_text = Entry(self.left_frame, font=self.MONO_FONT_INFO, textvariable=self.fifth_sv)
-        self.fifth_text.insert(0, self.ALL_FONTS[self.INDEX+2].center(center_val))
+        self.fifth_text.insert(0, self.FONTS_FILTERED[fifth_index].center(center_val))
         self.fifth_text.pack(expand=YES, fill=BOTH, side=TOP)
         
         
@@ -399,25 +500,61 @@ class TkinterFontsViewer(Frame):
         self.right_frame.pack(expand=YES, fill=BOTH, side=RIGHT)
         
         
-        # righ top info
+        # right top info
         self.top_info = Frame(self.right_frame)
         self.top_info.pack(expand=NO, fill=X, side=TOP)
+        
+        
+        # number of fonts
         self.top_info_left = Frame(self.top_info, relief=self.RELIEF_TYPE)
-        self.top_info_left.pack(expand=YES, fill=X, side=LEFT)
-        self.top_info_left_label = Label(self.top_info_left, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO_UPPER, text='TOTAL FONTS: {}'.format(self.NUMBER_OF_FONTS))
-        self.top_info_left_label.pack(expand=YES, fill=X, side=LEFT)
-        self.top_info_right = Frame(self.top_info, relief=self.RELIEF_TYPE)
-        self.top_info_right.pack(expand=YES, fill=X, side=RIGHT)
-        self.top_info_right_label = Label(self.top_info_right, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO_UPPER, text='CURRENT FONT:')
-        self.top_info_right_label.pack(expand=YES, fill=X, side=LEFT)
-        self.top_info_right_entry_sv = StringVar()
-        self.top_info_right_entry = Entry(self.top_info_right, font=self.MONO_FONT_INFO_UPPER, textvariable=self.top_info_right_entry_sv)
-        self.top_info_right_entry.insert(0, str(self.INDEX).center(center_val))
-        self.top_info_right_entry.bind('<Return>', self.entry_callback)
-        self.top_info_right_entry.pack(expand=NO, fill=Y, side=RIGHT)
+        self.top_info_left.pack(expand=YES, fill=BOTH, side=LEFT)
+        self.top_info_left_up = Label(self.top_info_left, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO_UPPER, text='TOTAL FONTS')
+        self.top_info_left_up.pack(expand=YES, fill=X, side=TOP)
+        self.top_info_left_down = Label(self.top_info_left, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO_UPPER, text='{}'.format(self.NUMBER_OF_FONTS))
+        self.top_info_left_down.pack(expand=YES, fill=X, side=BOTTOM)
         
         
-        self.main_label = Label(self.right_frame, relief=self.RELIEF_TYPE, font=self.MONO_FONT_NAME, text="MAIN LABEL")
+        # index entry
+        entries_size = 13
+        top_center_val = 15
+        
+        self.top_info_center_left = Frame(self.top_info, relief=self.RELIEF_TYPE)
+        self.top_info_center_left.pack(expand=YES, fill=BOTH, side=LEFT)
+        self.top_info_center_left_up = Label(self.top_info_center_left, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO_UPPER, text='CURRENT FONT')
+        self.top_info_center_left_up.pack(expand=YES, fill=X, side=TOP)
+        self.top_info_center_left_entry_sv = StringVar()
+        self.current_index_entry = Entry(self.top_info_center_left, width=entries_size, font=self.MONO_FONT_INFO_UPPER, textvariable=self.top_info_center_left_entry_sv)
+        self.current_index_entry.insert(0, str(self.INDEX).center(top_center_val))
+        self.current_index_entry.bind('<Return>', self.entry_callback)
+        self.current_index_entry.pack(expand=YES, fill=X, side=BOTTOM)
+        
+        
+        # filter entry
+        self.top_filter_frame = Frame(self.top_info, relief=self.RELIEF_TYPE)
+        self.top_filter_frame.pack(expand=YES, fill=BOTH, side=LEFT)
+        
+        self.top_filter_label = Label(self.top_filter_frame, relief=self.RELIEF_TYPE, font=self.MONO_FONT_INFO_UPPER, text='FILTER TEXT')
+        self.top_filter_label.pack(expand=YES, fill=X, side=TOP)
+        self.top_filter_sv = StringVar()
+        self.filter_entry = Entry(self.top_filter_frame, width=entries_size, font=self.MONO_FONT_INFO_UPPER, textvariable=self.top_filter_sv)
+        self.filter_entry.insert(0, str('<write here>').center(top_center_val))
+        self.filter_entry.bind('<Return>', self.filter_callback)
+        self.filter_entry.pack(expand=YES, fill=X, side=BOTTOM)
+        
+        
+        # mono-normal switch button
+        button_text = '{}\n{}'.format(' MODE ', self.FONTS_MODES_DICT[self.FONTS_MODE].upper())
+        self.top_button_frame = Frame(self.top_info, relief=self.RELIEF_TYPE)
+        self.top_button_frame.pack(expand=YES, fill=BOTH, side=LEFT)
+        self.mode_button = Button(self.top_button_frame, font=self.MONO_FONT_INFO_UPPER, text=button_text, command=self.switch_font_mode)
+        self.mode_button.pack(expand=YES, fill=X, side=TOP)
+        
+        
+        # ********* MAIN LABEL CONTENT *********
+        third_font = self.FONTS_FILTERED[self.INDEX]
+        start_text = self.perform_center_text(third_font)
+        self.FONT = TkFont.Font(family=third_font, size=50, weight="normal")
+        self.main_label = Label(self.right_frame, relief=self.RELIEF_TYPE, font=self.FONT, text=start_text)
         self.main_label.pack(expand=YES, fill=BOTH, side=BOTTOM)
         
         return True
