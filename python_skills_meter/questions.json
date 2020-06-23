@@ -1,0 +1,60 @@
+{
+    "how to join elements of list(list_var) with string(str_var)": [
+        "list_var.join(str_var)",
+        "str_var.join(list_var)(+)",
+        "list_var + str_var",
+        "list_var * str_var"
+    ],
+    "how to remove duplicates from list(list_var)": [
+        "list_var.remove_dupli()",
+        "set(list_var)",
+        "set(list(list_var))",
+        "list(set(list_var))(+)"
+    ],
+    "how to reverse string(str_var)": [
+        "str_var[1:1:-1]",
+        "str_var.reverse()",
+        "str_var[::-1](+)",
+        "str_var[::1]"
+    ],
+    "how to show object(object_var) methods and attributes": [
+        "str(object_var)",
+        "dir(object_var)(+)",
+        "id(object_var)",
+        "object(object_var)"
+    ],
+    "how to make a copy of list(list_var)": [
+        "list_var.copy()(+)",
+        "copy(list_var)",
+        "list_var.copy"
+    ],
+    "how to import everything from specified module": [
+        "from module import %",
+        "from module import *(+)",
+        "from module import &"
+    ],
+    "which of the following values is logical True": [
+        "None",
+        "''     # empty string",
+        "0",
+        "' '    # space(+)"
+    ],
+    "what is the name of most known python code formatter": [
+        "white",
+        "black(+)",
+        "red",
+        "green"
+    ],
+    "which of the following show us \"The Zen of Python\"": [
+        "import that",
+        "import this(+)",
+        "import then",
+        "import those"
+    ],
+    "how to list current directory files": [
+        "os.files()",
+        "os.list()",
+        "os.listdir()(+)",
+        "os.dir()"
+    ]
+}

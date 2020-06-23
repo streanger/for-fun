@@ -1,0 +1,26 @@
+# text format for questions
+question of something:
+    -first answer
+    -second answer
+    -third answer
+next question:
+    -option 1
+    -option 2
+    -option 3
+next question:
+    -option 1
+    -option 2
+    -option 3
+next question:
+    -option 1
+    -option 2
+next question:
+    -option 1
+    -option 2
+    -option 3
+next question:
+    -option 1
+    -option 2
+    -option 3
+    -option 4
+    
