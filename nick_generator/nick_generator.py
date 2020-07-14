@@ -11,8 +11,8 @@ def generate_nick(fully_random=True, vowel_start=False, max_vowels_len=2, max_co
     '''
 
     full = 'abcdefghijklmnopqrstuvwxyz'
-    vowels = 'aeijouy'
-    consonants = 'bcdfghklmnpqrstvwxz'
+    vowels = 'aeiouy'
+    consonants = 'bcdfghjklmnpqrstvwxz'
     
     nick = ''
     
