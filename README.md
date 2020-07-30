@@ -16,3 +16,7 @@
 ## screen from happy_couple animation
 
 ![image](happy_couple/happy_couple.png)
+
+## single frame from muminki_timer
+
+![image](muminki_timer/frame.png)
