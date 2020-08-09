@@ -20,3 +20,7 @@
 ## single frame from muminki_timer
 
 ![image](muminki_timer/frame.png)
+
+## frame from interactive_grid
+
+![image](interactive_grid/interactive_grid.png)
