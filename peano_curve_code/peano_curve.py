@@ -183,7 +183,7 @@ def draw_peano_curve_clear(start, iterations, step):
     return img
     
     
-def draw_peano_curve(start, iterations, step, color_effects, live_mode=False):
+def draw_peano_curve(start, iterations, step, color_effects, live_mode=False, margin=None):
     '''draw peano curve on blank image'''
     
     if not start in 'PQRS':
@@ -196,6 +196,9 @@ def draw_peano_curve(start, iterations, step, color_effects, live_mode=False):
     
     # create image, with proper shape
     width = height = (3**(iterations+1)-1)*step + 1
+    if margin:
+        width += margin
+        height += margin
     img = create_blank_image(height, width)
     
     
@@ -209,6 +212,10 @@ def draw_peano_curve(start, iterations, step, color_effects, live_mode=False):
         pos_x, pos_y = (width - 1, 0)
     elif start == 'R':
         pos_x, pos_y = (0, height - 1)
+        
+    if margin:
+        pos_x += margin//2
+        pos_y += margin//2
         
         
     # make live colors
@@ -263,6 +270,7 @@ def draw_peano_curve(start, iterations, step, color_effects, live_mode=False):
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             time.sleep(0.01)
+            # time.sleep(0.1)
             
     if live_mode:
         cv2.destroyAllWindows()
@@ -295,10 +303,10 @@ if __name__ == "__main__":
     
     # ********* draw peano curve on blank image *********
     start, iterations, step, color_effects = 'P', 2, 20, 0
-    out = draw_peano_curve(start, iterations, step, color_effects, live_mode=True)
+    out = draw_peano_curve(start, iterations, step, color_effects, live_mode=True, margin=40)
     # out = draw_peano_curve_clear(start, iterations, step)
-    filename = '{}_{}_{}_{}.png'.format(start, iterations, step, color_effects)
-    cv2.imwrite(filename, out)
+    # filename = '{}_{}_{}_{}.png'.format(start, iterations, step, color_effects)
+    # cv2.imwrite(filename, out)
     
     
     
