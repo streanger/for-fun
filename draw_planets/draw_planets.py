@@ -15,9 +15,9 @@ def draw_planet(img, center, radius, color, name, key):
     radius = round(radius)
     long_axis = round(radius)
     short_axis = round(long_axis/3)
-    cv2.ellipse(img, center, (long_axis, short_axis), 0, 0, 360, color, 2)
-    cv2.circle(img, (center[0] - radius, center[1]), 8, (255, 255, 255), -1)     # draw planet
-    cv2.circle(img, (center[0] - radius, center[1]), 5, color, -1)     # draw planet
+    cv2.ellipse(img, center, (long_axis, short_axis), 0, 0, 360, color, 2, lineType=cv2.LINE_AA)
+    cv2.circle(img, (center[0] - radius, center[1]), 8, (255, 255, 255), -1, lineType=cv2.LINE_AA)     # draw planet
+    cv2.circle(img, (center[0] - radius, center[1]), 5, color, -1, lineType=cv2.LINE_AA)     # draw planet
     font = cv2.FONT_HERSHEY_SIMPLEX
     cv2.putText(img, name, (center[0] - radius - key*20, center[1] - key*50), font, 3, color, 2, cv2.LINE_AA)
     return img
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     height, width = (4000, 10000)
     img = np.zeros((height,width,3), np.uint8)
     center = tuple(map(int, (width/2, height/2)))
-    cv2.circle(img, center, 15, (100, 255, 255), -1)     # sun position
+    cv2.circle(img, center, 15, (100, 255, 255), -1, lineType=cv2.LINE_AA)     # sun position
     
     # draw planets
     planets = planets_parameters()
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         img = draw_planet(img, center, radius, color, planet, key)
     
     show_image('img', img)
-    cv2.imwrite('solar_system.png', img)
+    cv2.imwrite('solar_system_AA.png', img)
     
     
     
