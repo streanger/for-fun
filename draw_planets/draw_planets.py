@@ -69,7 +69,7 @@ if __name__ == "__main__":
         img = draw_planet(img, center, radius, color, planet, key)
     
     show_image('img', img)
-    cv2.imwrite('solar_system_AA.png', img)
+    cv2.imwrite('solar_system.png', img)
     
     
     
