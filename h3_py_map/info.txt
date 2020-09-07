@@ -1,0 +1,4 @@
+-skrypt wykonany przy okazji konkursu na mapę w H3
+-poza powolnym działaniem (cała mapa 144x144 generuje się przez ~40 min :)) nie dojeżdża do końca
+-jedyne sensowna rzecz w tym skrypcie, to konwersja dowolnego obrazku, to kolorów z palety kolorów minimapy w H3
+-wrzucone jako backup
