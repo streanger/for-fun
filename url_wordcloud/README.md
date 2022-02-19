@@ -16,7 +16,7 @@ script for making wordclouds from websites content
 
 ## example
 
-![image](url_wordcloud/wordcloud.png)
+![image](wordcloud.png)
 
 ## todo
 
