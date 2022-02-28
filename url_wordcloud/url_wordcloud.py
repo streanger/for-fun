@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 import requests
 import bs4 as bs
 import lxml
@@ -8,6 +9,7 @@ from pathlib import Path
 from collections import Counter
 from nltk.tokenize import RegexpTokenizer  # word_tokenize, TreebankWordTokenizer
 from wordcloud import WordCloud, STOPWORDS
+from urllib.parse import urlparse
 
 
 def script_path():
@@ -69,10 +71,8 @@ def collect_stopwords():
     return stopwords
     
     
-def make_wordcloud(tokens):
+def make_wordcloud(tokens, stopwords):
     words = ' '.join(tokens)
-    # stopwords = set(STOPWORDS)
-    stopwords = collect_stopwords()
     wordcloud = WordCloud(
                     width = 1920,
                     height = 1080,
@@ -94,6 +94,16 @@ def show_wordcloud_plot(wordcloud):
     return None
     
     
+def timestamp_str():
+    return time.strftime("%Y%m%d_%H%M%S")
+    
+    
+def domain_name(url):
+    """extract domain name from url"""
+    domain = urlparse(url).netloc
+    return domain
+    
+    
 if __name__ == "__main__":
     script_path()
     
@@ -101,7 +111,7 @@ if __name__ == "__main__":
     url = 'https://www.telemagazyn.pl/'
     response = requests.get(url)
     tokens = website_tokens(response)
-    
+    print('[*] tokens numer: {}'.format(len(tokens)))
     
     # ******** unique ********
     # unique_words = sorted(list(set(tokens)))
@@ -109,8 +119,12 @@ if __name__ == "__main__":
     
     
     # ******* wordcloud *******
-    wordcloud = make_wordcloud(tokens)
-    wordcloud_file = 'wordcloud.png'
+    # stopwords = set(STOPWORDS)
+    stopwords = list(collect_stopwords())
+    stopwords.extend([])  # add stopwords here
+    
+    wordcloud = make_wordcloud(tokens, stopwords)
+    wordcloud_file = '{}_{}.png'.format(domain_name(url), timestamp_str())
     wordcloud.to_file(wordcloud_file)
     print('[*] image saved to file: {}'.format(wordcloud_file))
     
@@ -122,4 +136,9 @@ if __name__ == "__main__":
 """
 https://stackoverflow.com/questions/44203397/python-requests-get-returns-improperly-decoded-text-instead-of-utf-8
 https://www.kite.com/python/answers/how-to-remove-all-punctuation-marks-with-nltk-in-python
+https://stackoverflow.com/questions/44113335/extract-domain-from-url-in-python
+
+todo:
+    -add time to filename  (+)
+    -add domain name to filename  (+)
 """
