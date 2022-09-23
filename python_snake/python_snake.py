@@ -7,7 +7,7 @@ from pygame.locals import *
 
 
 def script_path():
-    '''change current path to script one'''
+    """change current path to script one"""
     current_path = os.path.realpath(os.path.dirname(sys.argv[0]))
     os.chdir(current_path)
     return current_path
@@ -16,12 +16,11 @@ def script_path():
 if __name__ == "__main__":
     script_path()
     
-    
     # ****************** init pygame ******************
     pygame.init()
     pygame.font.init()
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
-    
+    clock = pygame.time.Clock()
     
     # ****************** screen setup ******************
     size = width, height = 640, 480
@@ -57,12 +56,15 @@ if __name__ == "__main__":
     current_length = 2
     
     while 1:
+        clock.tick(10)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
             # print(event.type, event.dict, event)
+            # print(event.type)
             
             if event.type == 2:
+                print(event.scancode)
                 # 2 - KeyDown
                 if event.scancode == 80:
                     # print('down')
@@ -78,12 +80,34 @@ if __name__ == "__main__":
                     # print('right')
                     if speed[1]:
                         speed = [1*speed_coeff, 0]
-                    
+                        
                 elif event.scancode == 75:
                     # print('left')
                     if speed[1]:
                         speed = [-1*speed_coeff, 0]
                         
+            elif event.type == 768:
+                print(event.scancode)
+                # 2 - KeyDown
+                if event.scancode == 81:
+                    # print('down')
+                    if speed[0]:
+                        speed = [0, 1*speed_coeff]
+                    
+                elif event.scancode == 82:
+                    # print('up')
+                    if speed[0]:
+                        speed = [0, -1*speed_coeff]
+                    
+                elif event.scancode == 79:
+                    # print('right')
+                    if speed[1]:
+                        speed = [1*speed_coeff, 0]
+                    
+                elif event.scancode == 80:
+                    # print('left')
+                    if speed[1]:
+                        speed = [-1*speed_coeff, 0]
                         
         snake = snake.move(speed)
         
@@ -151,22 +175,21 @@ if __name__ == "__main__":
             
             textsurface = myfont.render('YOUR SCORE IS: {}'.format(current_length*10), False, (200, 20, 20))
             screen.blit(textsurface, (160, 80))
-            
-            pygame.display.flip()
-            # pygame.quit()
-            sys.exit()
-            
+            break
             
         # ****************** update screen ******************
         pygame.display.flip()
-        time.sleep(0.15)    # OK
-        color = (50, 50, 150)
         last_positions.append((snake.left, snake.right, snake.top, snake.bottom))
         last_positions = last_positions[-current_length:]
         # pygame.image.save(screen, "screenshot.png")
         
-        
-'''
+    # ********* cleanup *********
+    input('press enter to exit ')
+    pygame.display.flip()
+    pygame.quit()
+    sys.exit()
+    
+"""
 info:
     -pygame             (+)
     -tkinter            (-)
@@ -185,5 +208,9 @@ todo:
     -put meat only in free places, not onto the snake tail  (+)
     -make snake thinner than one grid size                  (-)
     -
+
+23.09.2022:
+    -constant frame rate:
+        https://stackoverflow.com/questions/67285976/pygame-pygame-time-clock-or-time-sleep
     
-'''
+"""
