@@ -1,6 +1,5 @@
 import sys
 import os
-# import time
 import random
 import pygame
 from pygame.locals import *
