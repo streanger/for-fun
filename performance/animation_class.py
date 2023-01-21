@@ -443,9 +443,3 @@ if __name__ == "__main__":
     kate.openCurtain(spacex, openSpeed="fast", direct="close")
     
     print("works fine")
-
-    
-    
-    
-
-

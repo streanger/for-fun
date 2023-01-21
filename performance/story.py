@@ -1,14 +1,17 @@
-#story with anime
-import random
-import animation_class as anime
 import sys
-from PIL import ImageGrab, Image
 import os
-import sys
+import random
+
+# 3rd party
+import numpy as np
+from PIL import ImageGrab, Image
+
+# my modules
+import check_gender_by_nick
+import animation_class as anime
 from alpha_image import alpha_image
 from wykop_avatars import convert_nick_str_to_list, save_avatars
-import check_gender_by_nick
-import numpy as np
+
 
 def script_path():
     '''change current path to script one'''
@@ -102,23 +105,7 @@ def create_humans(space, number, center, name="steve"):
             human.move(space, 'left', 15 + 30*x)
         humans.append(human)
     return humans   
-    
-def check_sex(nick):
-    base_url = "https://www.wykop.pl/ludzie/"
-    nick_url = urllib.parse.urljoin(base_url, nick)
-    res = requests.get(nick_url)
-    content = res.text
-    status = res.status_code    
-    #content, status = get_content(nick_url)
-    if status == 404:
-        return ""
-    soup = bs.BeautifulSoup(content, 'lxml')
-    hrefs = soup.find_all('meta', {'name': "profile:gender"})
-    print(hrefs)
-    #return avatar_url
 
-    return 'male'
-    
 def create_random(space, true_center, names):
     humans = []
     centers = []
@@ -222,13 +209,7 @@ def random_jump(space, jumper):
   
 def vikop_story():
     path = script_path()
-    nicks = '''@Arveit @Raptorini @Marterr_ @s0msiad
-               @Kulturalny_Jegomosc90 @milicja @Slacky @Faiko
-               @7845 @namzio @Rodzynek_w_serniku @Smutny_Daltonista
-               @Efilnikufesin @aceXgod mopig, Antyfeminista,
-               TriangulumAustrale stranger13'''
-    #nicks = '''TriangulumAustrale'''
-    nicks = 'stranger13'
+    nicks = """@Arveit @Raptorini @Marterr_ @s0msiad @Kulturalny_Jegomosc90 @milicja @Slacky @Faiko @7845 @namzio"""
     nick_list, to_call = convert_nick_str_to_list(nicks)
     avatars_paths = save_avatars(nick_list, subdir='avatars')       #in normal size
     avatars_paths = {key: alpha_image(value, 80, 80, 'circle_avatars') for key, value in avatars_paths.items()}     #resize, circle, alpha channel
