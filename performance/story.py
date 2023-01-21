@@ -1,15 +1,17 @@
-#story with anime
-import random
-import animation_class as anime
 import sys
-# from PIL import ImageGrab, Image
 import os
-import sys
-from alpha_image import alpha_image
-from wykop_avatars import convert_nick_str_to_list, save_avatars
-import check_gender_by_nick
+import random
+
+# 3rd party
 import numpy as np
 import winsound
+
+# my modules
+import check_gender_by_nick
+import animation_class as anime
+from alpha_image import alpha_image
+from wykop_avatars import convert_nick_str_to_list, save_avatars
+
 
 def script_path():
     '''change current path to script one'''
@@ -102,24 +104,8 @@ def create_humans(space, number, center, name="steve"):
             #human.move(space, 'down', 2)
             human.move(space, 'left', 15 + 30*x)
         humans.append(human)
-    return humans   
-    
-def check_sex(nick):
-    base_url = "https://www.wykop.pl/ludzie/"
-    nick_url = urllib.parse.urljoin(base_url, nick)
-    res = requests.get(nick_url)
-    content = res.text
-    status = res.status_code    
-    #content, status = get_content(nick_url)
-    if status == 404:
-        return ""
-    soup = bs.BeautifulSoup(content, 'lxml')
-    hrefs = soup.find_all('meta', {'name': "profile:gender"})
-    print(hrefs)
-    #return avatar_url
+    return humans
 
-    return 'male'
-    
 def create_random(space, true_center, names):
     humans = []
     centers = []
@@ -167,14 +153,14 @@ def main():
     args = sys.argv[1:]
     pngFiles = [item for item in args if item.endswith('.png')]
     if not pngFiles:
-        pngFiles = [item for item in os.listdir(path) if item.endswith('.png')]
+        images_path = 'images'
+        pngFiles = [os.path.join(images_path, item) for item in os.listdir(images_path) if item.endswith('.png')]
     # print(pngFiles)
     imgPath = random.choice(pngFiles)
     if not imgPath:
         return False
     # to_call = " ".join(["@" + item.strip() for item in nicks.split(",")])
     # humans_names = [item.strip() for item in nicks.split(',')]
-    # imgPath = 'C:\\Users\\SparkStorms\\Desktop\\scripts\\animation\\circle_avatars\\peppa.png'
     humans_names = {item.strip():imgPath for item in nicks.split(',')}
 
     spacex = anime.myhand(bg_color="black", line_size=2)
@@ -202,7 +188,7 @@ def main():
     # for x in range(0):
         for the_one in humans_all:
             if not quietMode:
-                winsound.PlaySound('smb_jump.wav', winsound.SND_ALIAS | winsound.SND_ASYNC)
+                winsound.PlaySound('sounds/smb_jump.wav', winsound.SND_ALIAS | winsound.SND_ASYNC)
             if randomMode:
                 random_jump_pig(spacex, the_one)
             else:
@@ -247,13 +233,7 @@ def random_jump_pig(space, jumper):
     
 def vikop_story():
     path = script_path()
-    nicks = '''@Arveit @Raptorini @Marterr_ @s0msiad
-               @Kulturalny_Jegomosc90 @milicja @Slacky @Faiko
-               @7845 @namzio @Rodzynek_w_serniku @Smutny_Daltonista
-               @Efilnikufesin @aceXgod mopig, Antyfeminista,
-               TriangulumAustrale stranger13'''
-    #nicks = '''TriangulumAustrale'''
-    nicks = 'stranger13'
+    nicks = """@Arveit @Raptorini @Marterr_ @s0msiad @Kulturalny_Jegomosc90 @milicja @Slacky @Faiko @7845 @namzio"""
     nick_list, to_call = convert_nick_str_to_list(nicks)
     avatars_paths = save_avatars(nick_list, subdir='avatars')       #in normal size
     avatars_paths = {key: alpha_image(value, 80, 80, 'circle_avatars') for key, value in avatars_paths.items()}     #resize, circle, alpha channel
@@ -288,13 +268,13 @@ def vikop_story():
     
 
 if __name__ == "__main__":
-    # vikop_story()
-    main()
-    # some_story()
+    # vikop_story()  # won't work due to wrong avatars request parsing
+    main()  # work quite fine
+    # some_story()  # won't work correctly due to some animation class changes
 
 '''    
 todo:
-    -rezie image +
+    -resize image +
     -cut circle +
     -make alpha channel +
     -add 'say' method with clouds

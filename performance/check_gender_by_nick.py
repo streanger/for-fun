@@ -16,7 +16,8 @@ def check_sex(nick):
         return "male", False
     gender = hrefs[0]['content']
     return gender, True
-    
+
+
 if __name__ == "__main__":
     nick = 'someone'
     gender, _ = check_sex(nick)
