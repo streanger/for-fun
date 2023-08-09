@@ -24,3 +24,7 @@
 ## frame from interactive_grid
 
 ![image](interactive_grid/interactive_grid.png)
+
+---
+
+![image](xkcd_bar/plt-xkcd-discover.png)
